@@ -15,6 +15,9 @@ python3 -m pip --upgrade
 python3 -m pip install -r requirements.txt
 sudo chmod 400 keys/id_rsa
 
+# install Azure CLI
+curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
 # update path
 export PATH=$PATH:~/.local/bin
 ```
