@@ -29,32 +29,32 @@ servers = []
 
 #################
 
-# print(f'{HEADER}Azure Login{ENDC}')
-# run('az login')
+print(f'{HEADER}Azure Login{ENDC}')
+run('az login')
 
-# ##################
+##################
 
-# print(f'{HEADER}Create Azure resource group{ENDC}')
-# run(f'az group create --location uksouth --name SECO')
+print(f'{HEADER}Create Azure resource group{ENDC}')
+run(f'az group create --location uksouth --name SECO')
 
-# ##################
+##################
 
-# print(f'{HEADER}Create Azure VM{ENDC}')
-# for i, size in enumerate(vmlist):
-#   name = f'vm{i+1}'
-#   dat = run(f'az vm create --resource-group SECO --name {name} --size {size} --image UbuntuLTS --ssh-key-values keys/id_rsa.pub --admin-username ansible')
+print(f'{HEADER}Create Azure VM{ENDC}')
+for i, size in enumerate(vmlist):
+  name = f'vm{i+1}'
+  dat = run(f'az vm create --resource-group SECO --name {name} --size {size} --image UbuntuLTS --ssh-key-values keys/id_rsa.pub --admin-username ansible')
 
-# ##################
+##################
 
-# print(f'{HEADER}Wait for deployment (1 minute){ENDC}')
-# sleep(60)
+print(f'{HEADER}Wait for deployment (1 minute){ENDC}')
+sleep(60)
 
-# #################
+#################
 
-# print(f'{HEADER}Open port 7071 for all VMs{ENDC}')
-# for i, size in enumerate(vmlist):
-#   name = f'vm{i+1}'
-#   run(f'az vm open-port --resource-group SECO --name {name} --port 7071')
+print(f'{HEADER}Open port 7071 for all VMs{ENDC}')
+for i, size in enumerate(vmlist):
+  name = f'vm{i+1}'
+  run(f'az vm open-port --resource-group SECO --name {name} --port 7071')
 
 #################
 
