@@ -20,7 +20,7 @@ def hostDetails():
             "Ram_write": self.parse_io(data[4]),
             "Disk_read": self.parse_io(data[1]),
             "Disk_write": self.parse_io(data[2])}
-     return json.dumps(payload)
+    return json.dumps(payload)
 
 def gethostStat():
     cpu = psutil.cpu_percent()
@@ -29,7 +29,7 @@ def gethostStat():
     disk_total = disk.used / (1024 * 1024)
     ts = time.time()
     payload = {"time-stamp":ts, "cpu":cpu, "memory":memory, "disk":disk_total}
-    print(json.dumps(payload))
+    return json.dumps(payload)
 
 if __name__ == '__main__':
     if sys.argv[-1] == 'stats':
