@@ -23,15 +23,13 @@ def hostDetails():
      return json.dumps(payload)
 
 def gethostStat():
-    rc = codes.SUCCESS 
     cpu = psutil.cpu_percent()
     memory = psutil.virtual_memory()[2]
     disk = psutil.disk_usage('/')
     disk_total = disk.used / (1024 * 1024)
     ts = time.time()
     payload = {"time-stamp":ts, "cpu":cpu, "memory":memory, "disk":disk_total}
-    data = json.dumps(payload)
-    return rc, data
+    print(json.dumps(payload))
 
 if __name__ == '__main__':
     if sys.argv[-1] == 'stats':
