@@ -65,12 +65,14 @@ for i, size in enumerate(vmlist):
   info = {'ip': ip, 'cpu': getdigit(size), 'powermodel': 'PM'+size.split('_')[1]}
   servers.append(info)
   run(f'rsync -Pav -e "ssh -i ./keys/id_rsa" ./functions/ ansible@{ip}:/home/ansible/functions/')
+  run(f'rsync -Pav -e "ssh -i ./keys/id_rsa" ./serverless/agent/ ansible@{ip}:/home/ansible/agent/')
   run(f"ssh -o StrictHostKeyChecking=no -i ./keys/id_rsa ansible@{ip} 'sudo apt-get -y update'")
   run(f"ssh -o StrictHostKeyChecking=no -i ./keys/id_rsa ansible@{ip} 'sudo apt-get -y install python3-venv python3-pip python3-distutils python3-apt'")
   run(f"ssh -o StrictHostKeyChecking=no -i ./keys/id_rsa ansible@{ip} 'wget -O ~/pkg.deb -q https://packages.microsoft.com/config/ubuntu/19.04/packages-microsoft-prod.deb'")
   run(f"ssh -o StrictHostKeyChecking=no -i ./keys/id_rsa ansible@{ip} 'sudo dpkg -i ~/pkg.deb'")
   run(f"ssh -o StrictHostKeyChecking=no -i ./keys/id_rsa ansible@{ip} 'sudo apt-get -y update && sudo apt-get -y install azure-functions-core-tools'")
   run(f"ssh -o StrictHostKeyChecking=no -i ./keys/id_rsa ansible@{ip} 'sudo chmod +x ~/functions/funcstart.sh'")
+  run(f"ssh -o StrictHostKeyChecking=no -i ./keys/id_rsa ansible@{ip} 'sudo chmod +x ~/agent/probe.sh'")
   run(f"ssh -o StrictHostKeyChecking=no -i ./keys/id_rsa ansible@{ip} 'cd ~/functions && ./funcstart.sh &>/dev/null'")
 
 #################
