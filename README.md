@@ -7,7 +7,7 @@ Serverless Co-Design Framework.
 
 ## Quick Start Guide
 
-Installation.
+### Installation.
 
 ```console
 # install prerequisites
@@ -22,12 +22,14 @@ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 export PATH=$PATH:~/.local/bin
 ```
 
-Quick test.
+Or use pre-installed gitpod.
+
+### Quick test.
 
 ```console
 # deploy a single VM and print VM IP
 python3 debug/deployazure.py
 
 # test function
-http http://<public_ip>:7071/api/onnx @tutorial/babyyoda.jpg > output.jpg
+http http://<public_ip>:7071/api/onnx @debug/babyyoda.jpg > output.jpg
 ```
