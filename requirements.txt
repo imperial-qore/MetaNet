@@ -21,7 +21,6 @@ SciencePlots
 seaborn
 tqdm
 httpie
-pprint
 optparse-pretty
 scipy
 matplotlib
