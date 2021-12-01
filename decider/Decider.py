@@ -1,4 +1,4 @@
-from serverless.function.Task import *
+from serverless.task.Task import *
 
 class Decider():
     def __init__(self):
@@ -20,7 +20,7 @@ class Decider():
             paths.append(f'./temp/{d2}_L_{cid}_{i}.jpg')
         return paths
 
-    def createTasks(cid, interval, SLA, application, choice):
+    def createTasks(self, cid, interval, SLA, application, choice):
         tasklist = []
         if choice == 'semantic':
             tasklist.append(Task(cid, interval, SLA, application, choice, self.env, 0, [], [self.dataset[0]]))

@@ -24,6 +24,8 @@ class Datacenter():
         self.fn_names = [name for name in os.listdir(FN_PATH) if os.path.isdir(FN_PATH+name)]
         self.dataset = list(filter(lambda k: '.md' not in k, os.listdir(SAMPLE_PATH)))
         self.dataset = [os.path.join(SAMPLE_PATH, i) for i in self.dataset]
+        if os.path.exists('./temp/'): shutil.rmtree('./temp/', ignore_errors=True)
+        os.makedirs('./temp/', exist_ok = True)
         if self.mode in [0, 1]:
             self.setupHosts()
         else:

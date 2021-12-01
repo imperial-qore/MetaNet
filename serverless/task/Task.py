@@ -1,4 +1,4 @@
-from utils.utils import *
+from utils.Utils import *
 
 class Task():
 	def __init__(self, creationID, creationInterval, sla, application, choice, Framework, taskID, precedence, input_imgs, HostID = -1):
