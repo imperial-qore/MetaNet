@@ -1,9 +1,12 @@
 # SECO
 Serverless Co-Design Framework.
+
+
    <a href="https://gitpod.io/#https://github.com/shreshthtuli/SECO/">
     <img src="https://gitpod.io/button/open-in-gitpod.svg" alt="Open in gitpod">
   </a>
 
+System decision making to meet system level objectives by exploiting the synergism of hardware and software through their concurrent design. 
 
 ## Quick Start Guide
 
