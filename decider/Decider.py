@@ -13,11 +13,11 @@ class Decider():
     def decision(self, workflowlist):
         pass
 
-    def getLayerInputs(self, cid, i):
+    def getLayerInputs(self, cid, app, i):
         paths = []
         for d in DSET:
             d2 = DSET[0].split('.')[0]
-            paths.append(f'./temp/{d2}_L_{cid}_{i}.jpg')
+            paths.append(f'./temp/{cid}_{i}_{app}_{d2}_L.jpg')
         return paths
 
     def createTasks(self, cid, interval, SLA, application, choice):

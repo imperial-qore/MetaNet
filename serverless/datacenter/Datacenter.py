@@ -51,10 +51,9 @@ class Datacenter():
         for server in self.servers:
             fn = self.fn_names[0]
             ip = server['ip']
-            res = runFunctions(server['ip'], fn, self.dataset[0], 'test.jpg')
+            res = runFunctions(server['ip'], fn, self.dataset[0], './temp/test.jpg')
             if not res:
                 raise Exception(f'Function {fn} failed on host {ip}')
-        os.remove("test.jpg")
 
     def generateHosts(self):
         hosts = []

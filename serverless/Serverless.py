@@ -62,12 +62,12 @@ class Serverless():
 		return [t.creationID() for t in self.activetasklist if t.hostid == hostID]
 
 	def getTasksInHosts(self):
-		return [len(self.getContainersOfHost(host)) for host in range(self.hostlimit)]
+		return [len(self.getTasksofHost(host)) for host in range(self.hostlimit)]
 
 	def visualSleep(self, t):
-		total = str(int(t//60))+" min, "+str(t%60)+" sec"
+		total = str(t%60)+" sec"
 		for i in range(int(t)):
-			print("\r>> Interval timer "+str(i//60)+" min, "+str(i%60)+" sec of "+total, end=' ')
+			print("\r>> Interval timer "+str(i%60)+" sec of "+total, end=' ')
 			sleep(1)
 		sleep(t % 1)
 		print()

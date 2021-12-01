@@ -30,7 +30,3 @@ def runFunctionsAll(ip, funcname, input_imgs, output_imgs=None):
         if i < len(input_imgs) - 1:
             cmd += ' && '
     subprocess.Popen(cmd, shell=True)
-    if output_imgs:
-        if os.path.getsize(output_imgs[0]) == 0:
-            return False
-    return True

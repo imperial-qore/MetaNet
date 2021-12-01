@@ -27,11 +27,11 @@ class Task():
 			for d in DSET:
 				d2 = d.split('.')[0]
 				if d2 in img:
-					self.output_imgs.append(f'./temp/{d2}_{ch}_{self.creationID}_{self.taskID}.jpg')
+					self.output_imgs.append(f'./temp/{self.creationID}_{self.taskID}_{self.application}_{d2}_{ch}.jpg')
 					break
 		
 	def runTask(self, ip):
-		runFunctions(ip, self.application, self.input_imgs, self.output_imgs)
+		runFunctionsAll(ip, self.application, self.input_imgs, self.output_imgs)
 
 	def destroy(self):
 		self.destroyAt = self.env.interval

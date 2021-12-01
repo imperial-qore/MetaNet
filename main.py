@@ -86,7 +86,7 @@ def initalizeEnvironment(environment, mode):
 	numdep = env.allocateInit(newtasklist, decision) # Schedule functions
 	print("New Tasks Size:", len(newtasklist))
 	print("Waiting List Size:", len(env.waitinglist))
-	print("Containers in host:", env.getContainersInHosts())
+	print("Containers in host:", env.getTasksInHosts())
 	print("Deployed:", numdep, "of", len(env.waitinglist + newtasklist))
 	print("Decision:", decision)
 
@@ -102,7 +102,7 @@ def stepSimulation(workload, scheduler, env, stats):
 	numdep = env.simulationStep(newtasklist, decision) # Schedule containers
 	print("New Tasks Size:", len(newtasklist))
 	print("Waiting List Size:", len(env.waitinglist))
-	print("Containers in host:", env.getContainersInHosts())
+	print("Containers in host:", env.getTasksInHosts())
 	print("Deployed:", numdep, "of", len(env.waitinglist + newtasklist))
 	print("Destroyed:", numdes, "of", len(env.activetasklist))
 	print("Decision:", decision)
