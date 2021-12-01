@@ -59,7 +59,7 @@ class Serverless():
 		return len(self.activetasklist())
 
 	def getTasksofHost(self, hostID):
-		return [t.creationID() for t in self.activetasklist if t.hostid == hostID]
+		return [t.creationID for t in self.activetasklist if t.hostid == hostID]
 
 	def getTasksInHosts(self):
 		return [len(self.getTasksofHost(host)) for host in range(self.hostlimit)]
@@ -98,7 +98,7 @@ class Serverless():
 			task = newtasklist[i]
 			if self.canRun(task):
 				task.hostid = hid; task.startAt = self.interval; task.runTask(self.getHostByID(hid).ip)	
-				deployed += 1
+				self.activetasklist.append(task); deployed += 1
 			else:
 				self.waitinglist.append(task)	
 		self.visualSleep(self.intervaltime)
@@ -106,20 +106,20 @@ class Serverless():
 			host.updateUtilizationMetrics()
 		return deployed
 
-	def simulationStep(self, decision):
+	def simulationStep(self, newtasklist, decision):
 		self.interval += 1
 		start = time(); deployed = 0
-		decisionwaiting, decisionnew = decision[:len(newtasklist)], decision[len(newtasklist):]
+		decisionwaiting, decisionnew = decision[:len(self.waitinglist)], decision[len(self.waitinglist):]
 		for i, hid in enumerate(decisionwaiting):
 			task = self.waitinglist[i]
 			if self.canRun(task):
 				task.hostid = hid; task.startAt = self.interval; task.runTask(self.getHostByID(hid).ip)	
-				deployed += 1
+				self.activetasklist.append(task); deployed += 1
 		for i, hid in enumerate(decisionnew):
 			task = newtasklist[i]
 			if self.canRun(task):
 				task.hostid = hid; task.startAt = self.interval; task.runTask(self.getHostByID(hid).ip)	
-				deployed += 1
+				self.activetasklist.append(task); deployed += 1
 			else:
 				self.waitinglist.append(task)	
 		self.visualSleep(self.intervaltime)
