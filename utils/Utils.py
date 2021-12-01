@@ -2,6 +2,7 @@ import os
 import logging
 import json
 import re
+from glob import glob
 from subprocess import call, run, PIPE
 from .ColorUtils import *
 
@@ -24,6 +25,11 @@ def unixify(paths):
 		for file in os.listdir(path):
 			if '.py' in file or '.sh' in file:
 				_ = os.system("bash -c \"dos2unix "+path+file+" 2&> /dev/null\"")
+
+def delfiles(creationID, taskID=None):
+  fileList = glob(f'./temp/{creationID}_**' if taskID is None else f'./temp/{creationID}_{taskID}_**')
+  for filePath in fileList:
+    os.remove(filePath)
 
 def getdigit(string):
   for s in string:

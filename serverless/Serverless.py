@@ -1,6 +1,7 @@
 from .node.Node import *
 from .task.Task import *
 from .datacenter.server.controller import *
+from utils.Utils import *
 from time import time, sleep
 import multiprocessing, os
 from joblib import Parallel, delayed
@@ -81,14 +82,19 @@ class Serverless():
 		return np.all(done)
 
 	def destroyCompletedTasks(self):
-		destroyed = 0
+		destroyed = 0; toremove = []
 		for i, task in enumerate(self.activetasklist):
 			outputexist = [os.path.exists(path) for path in task.output_imgs]
 			if np.all(outputexist):
 				destroyed += 1
 				task.destroy()
-				self.activetasklist.remove(task)
+				toremove.append(task)
 				self.completedtasklist.append(task)
+				if task.choice in ['semantic', 'compression']:
+					delfiles(task.creationID, task.taskID)
+				if task.choice == 'layer' and task.taskID == 1:
+					delfiles(task.creationID)
+		for task in toremove: self.activetasklist.remove(task)
 		return destroyed
 
 	def allocateInit(self, newtasklist, decision):
@@ -108,13 +114,13 @@ class Serverless():
 
 	def simulationStep(self, newtasklist, decision):
 		self.interval += 1
-		start = time(); deployed = 0
+		start = time(); deployed = 0; toremove = []
 		decisionwaiting, decisionnew = decision[:len(self.waitinglist)], decision[len(self.waitinglist):]
 		for i, hid in enumerate(decisionwaiting):
 			task = self.waitinglist[i]
 			if self.canRun(task):
 				task.hostid = hid; task.startAt = self.interval; task.runTask(self.getHostByID(hid).ip)	
-				self.activetasklist.append(task); deployed += 1
+				toremove.append(task); self.activetasklist.append(task); deployed += 1
 		for i, hid in enumerate(decisionnew):
 			task = newtasklist[i]
 			if self.canRun(task):
@@ -122,6 +128,7 @@ class Serverless():
 				self.activetasklist.append(task); deployed += 1
 			else:
 				self.waitinglist.append(task)	
+		for task in toremove: self.waitinglist.remove(task)
 		self.visualSleep(self.intervaltime)
 		for host in self.hostlist:
 			host.updateUtilizationMetrics()

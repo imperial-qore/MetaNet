@@ -43,15 +43,9 @@ opts, args = parser.parse_args()
 
 # Global constants
 NUM_SIM_STEPS = 100
-HOSTS = 10 * 5 if opts.env == '' else 10
-CONTAINERS = HOSTS
-TOTAL_POWER = 1000
-ROUTER_BW = 10000
+HOSTS = 10
 INTERVAL_TIME = 5 # seconds
-NEW_CONTAINERS = 0 if HOSTS == 10 else 5
-DB_NAME = ''
-DB_HOST = ''
-DB_PORT = 0
+NEW_CONTAINERS = 0
 HOSTS_IP = []
 
 def initalizeEnvironment(environment, mode):
@@ -111,21 +105,12 @@ def saveStats(stats, datacenter, workload, env, end=True):
 	dirname += "_" + workload.__class__.__name__
 	dirname += "_" + str(NUM_SIM_STEPS) 
 	dirname += "_" + str(HOSTS)
-	dirname += "_" + str(CONTAINERS)
-	dirname += "_" + str(TOTAL_POWER)
-	dirname += "_" + str(ROUTER_BW)
 	dirname += "_" + str(INTERVAL_TIME)
 	dirname += "_" + str(NEW_CONTAINERS)
 	if not os.path.exists("logs"): os.mkdir("logs")
 	if os.path.exists(dirname): shutil.rmtree(dirname, ignore_errors=True)
 	os.mkdir(dirname)
 	stats.generateDatasets(dirname)
-	if 'Datacenter' in datacenter.__class__.__name__:
-		saved_env, saved_workload, saved_datacenter, saved_scheduler, saved_sim_scheduler = stats.env, stats.workload, stats.datacenter, stats.scheduler, stats.simulated_scheduler
-		stats.env, stats.workload, stats.datacenter, stats.scheduler, stats.simulated_scheduler = None, None, None, None, None
-		with open(dirname + '/' + dirname.split('/')[1] +'.pk', 'wb') as handle:
-		    pickle.dump(stats, handle)
-		stats.env, stats.workload, stats.datacenter, stats.scheduler, stats.simulated_scheduler = saved_env, saved_workload, saved_datacenter, saved_scheduler, saved_sim_scheduler
 	if not end: return
 	stats.generateGraphs(dirname)
 	stats.generateCompleteDatasets(dirname)
@@ -137,10 +122,10 @@ if __name__ == '__main__':
 	datacenter, workload, scheduler, decider, env, stats = initalizeEnvironment(opts.env, int(opts.mode))
 
 	for step in range(NUM_SIM_STEPS):
-		print(color.BOLD+"Simulation Interval:", step, color.ENDC)
+		print(color.GREEN+"Execution Interval:", step, color.ENDC)
 		stepSimulation(workload, scheduler, decider, env, stats)
-		if step % 10 == 0: saveStats(stats, datacenter, workload, env, end = False)
+		# if step % 10 == 0: saveStats(stats, datacenter, workload, env, end = False)
 
 	datacenter.cleanup()
-	saveStats(stats, datacenter, workload, env)
+	# saveStats(stats, datacenter, workload, env)
 
