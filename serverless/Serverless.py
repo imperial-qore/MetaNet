@@ -5,6 +5,7 @@ from time import time, sleep
 import multiprocessing, os
 from joblib import Parallel, delayed
 from copy import deepcopy
+import numpy as np
 
 num_cores = multiprocessing.cpu_count()
 
@@ -72,9 +73,10 @@ class Serverless():
 		print()
 
 	def canRun(self, task):
-		done = [False] * len(task.precendence)
+		if len(task.precedence) == 0: return True
+		done = [False] * len(task.precedence)
 		for t in self.completedtasklist:
-			if t.creationID == task.creationID and t.taskID in task.precendence:
+			if t.creationID == task.creationID and t.taskID in task.precedence:
 				done[t.taskID] = True
 		return np.all(done)
 

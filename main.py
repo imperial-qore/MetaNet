@@ -4,7 +4,6 @@ import optparse
 import logging as logger
 import configparser
 import pickle
-import shutil
 import platform
 from time import time
 from subprocess import call

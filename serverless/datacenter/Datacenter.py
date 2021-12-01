@@ -11,6 +11,7 @@ from metrics.Disk import *
 from metrics.RAM import *
 from metrics.Bandwidth import *
 from utils.Utils import *
+import shutil
 
 import multiprocessing, os, platform
 from joblib import Parallel, delayed
