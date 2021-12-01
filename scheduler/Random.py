@@ -6,8 +6,6 @@ class RandomScheduler(Scheduler):
 	def __init__(self):
 		super().__init__()
 
-	def selection(self):
-		return self.RandomContainerSelection()
-
-	def placement(self, containerIDs):
-		return self.RandomPlacement(containerIDs)
+	def placement(self, tasks):
+		start = time()
+		return self.RandomPlacement(tasks), time() - start

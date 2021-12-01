@@ -5,4 +5,9 @@ class SemanticOnlyDecider(Decider):
 		super().__init__()
 
 	def decision(self, workflowlist):
-		return [self.choices[1]] * len(workflowlist)
+		results = []
+		for CreationID, interval, SLA, application in workflowlist:
+			choice = self.choices[1]
+			tasklist = self.createTasks(CreationID, interval, SLA, application, choice)
+			results += tasklist
+		return results

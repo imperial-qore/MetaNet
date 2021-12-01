@@ -1,9 +1,14 @@
 from .Decider import *
-import random
+import numpy as np
 
 class RandomDecider(Decider):
 	def __init__(self):
 		super().__init__()
 
 	def decision(self, workflowlist):
-		return random.choices(self.choices, k = len(workflowlist))
+		results = []
+		for CreationID, interval, SLA, application in workflowlist:
+			choice = np.random.choice(self.choices)
+			tasklist = self.createTasks(CreationID, interval, SLA, application, choice)
+			results += tasklist
+		return results

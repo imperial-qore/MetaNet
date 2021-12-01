@@ -8,6 +8,8 @@ from .ColorUtils import *
 FN_PATH = './functions/'
 IPS_PATH = './serverless/datacenter/ips.json'
 SAMPLE_PATH = './samples/'
+DSET = list(filter(lambda k: '.md' not in k, os.listdir(SAMPLE_PATH)))
+DSET = [os.path.join(SAMPLE_PATH, i) for i in self.dataset]
 
 def printDecisionAndMigrations(decision, migrations):
 	print('Decision: [', end='')
