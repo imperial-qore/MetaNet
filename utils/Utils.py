@@ -2,7 +2,7 @@ import os
 import logging
 import json
 import re
-from subprocess import call
+from subprocess import call, run, PIPE
 from .ColorUtils import *
 
 FN_PATH = './functions/'
@@ -18,19 +18,23 @@ def printDecisionAndMigrations(decision, migrations):
 		print(',', end='') if i != len(decision)-1 else print(']')
 	print()
 
-
 def unixify(paths):
 	for path in paths:
 		for file in os.listdir(path):
 			if '.py' in file or '.sh' in file:
 				_ = os.system("bash -c \"dos2unix "+path+file+" 2&> /dev/null\"")
 
-def runcmd(cmd, shell=True):
-  data = subprocess.run(cmd, shell=shell, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-  if 'ERROR' in data.stderr.decode():
+def getdigit(string):
+  for s in string:
+   if s.isdigit():
+      return int(s)
+
+def runcmd(cmd, shell=True, pipe=True):
+  data = run(cmd, shell=shell, stdout=PIPE, stderr=PIPE) if pipe else run(cmd, shell=shell)
+  if pipe and 'ERROR' in data.stderr.decode():
     print(cmd)
-    print(FAIL)
+    print(color.FAIL)
     print(data.stderr.decode())
-    print(ENDC)
+    print(color.ENDC)
     exit()
-  return data.stdout.decode(), data.stderr.decode()
+  return data.stdout.decode() if pipe else None

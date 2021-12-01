@@ -14,7 +14,7 @@ System decision making to meet system level objectives by exploiting the synergi
 
 ```console
 # install prerequisites
-apt install rsync
+sudo apt -y update && apt install -y rsync
 python3 -m pip --upgrade pip
 python3 -m pip install matplotlib scikit-learn
 python3 -m pip install -r requirements.txt

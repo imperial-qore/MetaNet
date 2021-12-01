@@ -1,4 +1,4 @@
-from serverless.server.controller import *
+from .server.controller import *
 from metrics.powermodels.PMRaspberryPi import *
 from metrics.powermodels.PMB2s import *
 from metrics.powermodels.PMB2ms import *
@@ -42,26 +42,27 @@ class Datacenter():
     def checkHosts(self):
         if not os.path.isfile(IPS_PATH):
             raise Exception('ips.json file does not exist')
-        with open('serverless/datacenter/ips.json', 'w') as f:
+        with open(IPS_PATH, 'r') as f:
             config = json.load(f)
         self.servers = config['servers']
         for server in self.servers:
-            for fn in self.fn_names:
-                ip = servers['ip']
-                res = runFunctions(server['ip'], fn, self.dataset[0], 'test.jpg')
-                if not res:
-                    raise Exception(f'Function {fn} failed on host {ip}')
+            fn = self.fn_names[0]
+            ip = server['ip']
+            res = runFunctions(server['ip'], fn, self.dataset[0], 'test.jpg')
+            if not res:
+                raise Exception(f'Function {fn} failed on host {ip}')
+        os.remove("test.jpg")
 
     def generateHosts(self):
-        print(color.HEADER+"Obtaining host information and generating Host objects"+color.ENDC)
         hosts = []
-        powermodels = [server["powermodel"] for server in self.servers]
-        outputHostsData = Parallel(n_jobs=num_cores)(delayed(gethostDetails)(i) for i in self.hosts)
+        print(color.HEADER+"Obtaining host information and generating Host objects"+color.ENDC)
+        ips = [server['ip'] for server in self.servers]
+        outputHostsData = Parallel(n_jobs=num_cores)(delayed(gethostDetails)(i) for i in ips)
         for i, data in enumerate(outputHostsData):
             IP = self.servers[i]['ip']
             print(color.BOLD+"Host details collected from: {}".format(IP)+color.ENDC, data)
             IPS = (20167518615 * self.servers[i]['cpu'])/(float(data['clock']) * 1000000)
-            Power = eval(powermodels[i]+"()")
+            Power = eval(self.servers[i]['powermodel']+"()")
             Ram = RAM(data['Total_Memory'], data['Ram_read'], data['Ram_write'])
             Disk_ = Disk(data['Total_Disk'], data['Disk_read'], data['Disk_write'])
             Bw = Bandwidth(data['Bandwidth'], data['Bandwidth'])

@@ -13,7 +13,7 @@ from os import system, rename
 # Framework imports
 from serverless.Serverless import *
 from serverless.datacenter.AzureDatacenter import *
-from serverless.workload.DeFogWorkload import *
+from serverless.workload.AIBenchWorkload import *
 
 # Provisioner imports
 from provisioner.Provisioner import Provisioner
@@ -23,7 +23,6 @@ from provisioner.Random_Provisioner import RandomProvisioner
 from decider.Random import RandomDecider
 from decider.Layer_Only import LayerOnlyDecider
 from decider.Semantic_Only import SemanticOnlyDecider
-from decider.MABDecider import MABDecider
 
 # Scheduler imports
 from scheduler.IQR_MMT_Random import IQRMMTRScheduler
@@ -162,7 +161,7 @@ def saveStats(stats, datacenter, workload, env, end=True):
 	    pickle.dump(stats, handle)
 
 if __name__ == '__main__':
-	datacenter, workload, scheduler, env, stats = initalizeEnvironment(env, int(opts.mode))
+	datacenter, workload, scheduler, env, stats = initalizeEnvironment(opts.env, int(opts.mode))
 
 	for step in range(NUM_SIM_STEPS):
 		print(color.BOLD+"Simulation Interval:", step, color.ENDC)

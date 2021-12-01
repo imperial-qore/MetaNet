@@ -10,7 +10,7 @@ class AzureDatacenter(Datacenter):
         self.servers = []
         # Login to Azure
         print(f'{color.HEADER}Azure Login{color.ENDC}')
-        runcmd(f'az login --user-device-code')
+        runcmd(f'az login --use-device-code', pipe=False)
         # Create resource group 
         print(f'{color.HEADER}Create Azure resource group{color.ENDC}')
         runcmd(f'az group create --location uksouth --name SECO')
@@ -36,9 +36,9 @@ class AzureDatacenter(Datacenter):
           self.servers.append(info)
           runcmd(f'rsync -Pav -e "ssh -i ./keys/id_rsa" ./functions/ ansible@{ip}:/home/ansible/functions/')
           runcmd(f'rsync -Pav -e "ssh -i ./keys/id_rsa" ./serverless/datacenter/agent/ ansible@{ip}:/home/ansible/agent/')
-          runcmd(f"ssh -o StrictHostKeyChecking=no -i ./keys/id_rsa ansible@{ip} 'python3 -m pip install psutil'")
           runcmd(f"ssh -o StrictHostKeyChecking=no -i ./keys/id_rsa ansible@{ip} 'sudo apt-get -y update'")
           runcmd(f"ssh -o StrictHostKeyChecking=no -i ./keys/id_rsa ansible@{ip} 'sudo apt-get -y install python3-venv python3-pip python3-distutils python3-apt'")
+          runcmd(f"ssh -o StrictHostKeyChecking=no -i ./keys/id_rsa ansible@{ip} 'python3 -m pip install psutil'")
           runcmd(f"ssh -o StrictHostKeyChecking=no -i ./keys/id_rsa ansible@{ip} 'wget -O ~/pkg.deb -q https://packages.microsoft.com/config/ubuntu/19.04/packages-microsoft-prod.deb'")
           runcmd(f"ssh -o StrictHostKeyChecking=no -i ./keys/id_rsa ansible@{ip} 'sudo dpkg -i ~/pkg.deb'")
           runcmd(f"ssh -o StrictHostKeyChecking=no -i ./keys/id_rsa ansible@{ip} 'sudo apt-get -y update && sudo apt-get -y install ioping sysbench azure-functions-core-tools'")
@@ -47,9 +47,9 @@ class AzureDatacenter(Datacenter):
           runcmd(f"ssh -o StrictHostKeyChecking=no -i ./keys/id_rsa ansible@{ip} 'cd ~/functions && ./funcstart.sh &>/dev/null'")
         # Save to ips.json
         print(f'{color.HEADER}Saving VM IPs to ips.json{color.ENDC}')
-        config = {'servers': servers}
+        config = {'servers': self.servers}
         with open(IPS_PATH, 'w') as f:
-            json.dump(config, f)
+            json.dump(config, f, indent=4)
 
     def destroyHosts(self):
         # Delete VMs

@@ -1,4 +1,4 @@
-import json
+import json, os
 import subprocess
 
 def gethostStat(ip):
