@@ -95,6 +95,9 @@ class Serverless():
 		for task in toremove: self.activetasklist.remove(task)
 		return toremove
 
+	def parallelizedFunc(self, i):
+		self.hostlist[i].updateUtilizationMetrics()
+
 	def allocateInit(self, newtasklist, decision):
 		self.interval += 1
 		start = time(); deployed = 0
@@ -106,8 +109,7 @@ class Serverless():
 			else:
 				self.waitinglist.append(task)	
 		self.visualSleep(self.intervaltime)
-		for host in self.hostlist:
-			host.updateUtilizationMetrics()
+		Parallel(n_jobs=num_cores, backend='threading')(delayed(self.parallelizedFunc)(i) for i in list(range(len(self.hostlist))))
 		return deployed
 
 	def simulationStep(self, newtasklist, decision):
@@ -128,6 +130,5 @@ class Serverless():
 				self.waitinglist.append(task)	
 		for task in toremove: self.waitinglist.remove(task)
 		self.visualSleep(self.intervaltime)
-		for host in self.hostlist:
-			host.updateUtilizationMetrics()
+		Parallel(n_jobs=num_cores, backend='threading')(delayed(self.parallelizedFunc)(i) for i in list(range(len(self.hostlist))))
 		return deployed

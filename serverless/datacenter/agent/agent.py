@@ -31,7 +31,7 @@ def hostDetails():
     return json.dumps(payload)
 
 def gethostStat():
-    cpu = psutil.cpu_percent()
+    cpu = psutil.cpu_percent(interval=1)
     memory = psutil.virtual_memory()[2]
     disk = psutil.disk_usage('/')
     disk_total = disk.used / (1024 * 1024)
