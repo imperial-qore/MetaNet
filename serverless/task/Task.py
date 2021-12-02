@@ -35,4 +35,3 @@ class Task():
 
 	def destroy(self):
 		self.destroyAt = self.env.interval
-		self.hostid = -1

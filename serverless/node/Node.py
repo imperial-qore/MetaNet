@@ -25,12 +25,10 @@ class Node():
 		self.powermodel.allocHost(self)
 		self.powermodel.host = self
 		self.env = Serverless
+		self.enable = True
 		
 	def getPower(self):
-		return self.powermodel.power()
-
-	def getPowerFromIPS(self, ips):
-		return self.powermodel.powerFromCPU(self.getCPU())
+		return self.powermodel.power() if self.enable else 0
 
 	def getCPU(self):
 		# 0 - 100 last interval

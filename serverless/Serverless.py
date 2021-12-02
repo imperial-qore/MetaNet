@@ -14,12 +14,14 @@ class Serverless():
 	# Total power in watt
 	# Total Router Bw
 	# Interval Time in seconds
-	def __init__(self, Scheduler, Decider, IntervalTime, hostinit, env):
+	def __init__(self, Scheduler, Decider, Provisioner, IntervalTime, hostinit, env):
 		self.hostlimit = len(hostinit)
 		self.scheduler = Scheduler
 		self.scheduler.setEnvironment(self)
 		self.decider = Decider
 		self.decider.setEnvironment(self)
+		self.provisioner = Provisioner
+		self.provisioner.setEnvironment(self)
 		self.hostlist = []
 		self.completedtasklist = []
 		self.activetasklist = []
@@ -103,7 +105,7 @@ class Serverless():
 		start = time(); deployed = 0
 		for i, hid in enumerate(decision):
 			task = newtasklist[i]
-			if self.canRun(task):
+			if self.canRun(task) and self.hostlist[hid].enable:
 				task.hostid = hid; task.startAt = self.interval; task.runTask(self.getHostByID(hid).ip)	
 				self.activetasklist.append(task); deployed += 1
 			else:
@@ -118,12 +120,12 @@ class Serverless():
 		decisionwaiting, decisionnew = decision[:len(self.waitinglist)], decision[len(self.waitinglist):]
 		for i, hid in enumerate(decisionwaiting):
 			task = self.waitinglist[i]
-			if self.canRun(task):
+			if self.canRun(task) and self.hostlist[hid].enable:
 				task.hostid = hid; task.startAt = self.interval; task.runTask(self.getHostByID(hid).ip)	
 				toremove.append(task); self.activetasklist.append(task); deployed += 1
 		for i, hid in enumerate(decisionnew):
 			task = newtasklist[i]
-			if self.canRun(task):
+			if self.canRun(task) and self.hostlist[hid].enable:
 				task.hostid = hid; task.startAt = self.interval; task.runTask(self.getHostByID(hid).ip)	
 				self.activetasklist.append(task); deployed += 1
 			else:

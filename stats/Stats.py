@@ -26,6 +26,7 @@ class Stats():
 		hostinfo = dict()
 		hostinfo['interval'] = self.env.interval
 		hostinfo['cpu'] = [host.getCPU() for host in self.env.hostlist]
+		hostinfo['enable'] = [int(host.enable) for host in self.env.hostlist]
 		hostinfo['numcontainers'] = [len(self.env.getTasksofHost(i)) for i,host in enumerate(self.env.hostlist)]
 		hostinfo['power'] = [host.getPower() for host in self.env.hostlist]
 		hostinfo['baseips'] = [host.getBaseIPS() for host in self.env.hostlist]
@@ -213,6 +214,7 @@ class Stats():
 		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'cpu')
 		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'numcontainers')
 		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'power')
+		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'enable')
 		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'baseips', 'apparentips')
 		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'ipscap', 'apparentips')
 		self.generateMetricsWithInterval(dirname)
@@ -220,6 +222,7 @@ class Stats():
 
 	def generateDatasets(self, dirname):
 		self.generateSimpleHostDatasetWithInterval(dirname, 'cpu')
+		self.generateSimpleHostDatasetWithInterval(dirname, 'enable')
 		self.generateSimpleDeciderDatasetWithInterval(dirname)
 		self.generateSimpleSchedulerDatasetWithInterval(dirname)
 		

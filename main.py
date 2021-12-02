@@ -42,7 +42,7 @@ parser.add_option("-m", "--mode", action="store", dest="mode", default="0",
 opts, args = parser.parse_args()
 
 # Global constants
-NUM_SIM_STEPS = 100
+NUM_SIM_STEPS = 200
 HOSTS = 10
 INTERVAL_TIME = 5 # seconds
 NEW_TASKS = 0
@@ -57,6 +57,10 @@ def initalizeEnvironment(environment, mode):
 	''' Can be AIBench '''
 	workload = AIBenchWorkload(NEW_TASKS, 1.5)
 
+	# Initialize provisioner
+	''' Can be Random '''
+	provisioner = RandomProvisioner() 
+
 	# Initialize decider
 	''' Can be Random '''
 	decider = RandomDecider() 
@@ -66,11 +70,12 @@ def initalizeEnvironment(environment, mode):
 	scheduler = RandomScheduler() 
 
 	# Initialize Environment
-	env = Serverless(scheduler, decider, INTERVAL_TIME, hostlist, environment)
+	env = Serverless(scheduler, decider, provisioner, INTERVAL_TIME, hostlist, environment)
 
 	# Execute first step
 	workloadlist = workload.generateNewContainers(env.interval) # New containers info
-	newtasklist = decider.decision(workloadlist)
+	provisioner.provision() # Provision hosts
+	newtasklist = decider.decision(workloadlist) # Decide splitting choice
 	decision, schedulingTime = scheduler.placement(newtasklist) # Decide placement using task objects
 	numdep = env.allocateInit(newtasklist, decision) # Schedule functions
 	print("New Tasks Size:", len(newtasklist))
@@ -82,11 +87,12 @@ def initalizeEnvironment(environment, mode):
 	# Initialize stats
 	stats = Stats(env, workload, datacenter, scheduler)
 	stats.saveStats(numdep, [], newtasklist, decision, schedulingTime)
-	return datacenter, workload, scheduler, decider, env, stats
+	return datacenter, workload, scheduler, decider, provisioner, env, stats
 
-def stepSimulation(workload, scheduler, decider, env, stats):
+def stepSimulation(workload, scheduler, decider, provisioner, env, stats):
 	workloadlist = workload.generateNewContainers(env.interval) # New containers info
-	newtasklist = decider.decision(workloadlist)
+	provisioner.provision() # Provision hosts
+	newtasklist = decider.decision(workloadlist) # Decide splitting choice
 	decision, schedulingTime = scheduler.placement(env.waitinglist + newtasklist) # Decide placement using task objects
 	destroyed = env.destroyCompletedTasks()
 	numdep = env.simulationStep(newtasklist, decision) # Schedule containers
@@ -108,7 +114,7 @@ def saveStats(stats, dirname, end=True):
 
 if __name__ == '__main__':
 	# Initialize Environment
-	datacenter, workload, scheduler, decider, env, stats = initalizeEnvironment(opts.env, int(opts.mode))
+	datacenter, workload, scheduler, decider, provisioner, env, stats = initalizeEnvironment(opts.env, int(opts.mode))
 
 	# Create log directory
 	dirname = "logs/" + decider.__class__.__name__ + '_' + scheduler.__class__.__name__
@@ -119,7 +125,7 @@ if __name__ == '__main__':
 	# Execute steps
 	for step in range(NUM_SIM_STEPS):
 		print(color.GREEN+"Execution Interval:", step, color.ENDC)
-		stepSimulation(workload, scheduler, decider, env, stats)
+		stepSimulation(workload, scheduler, decider, provisioner, env, stats)
 		if step % 10 == 0: saveStats(stats, dirname, end = False)
 
 	# Cleanup and save results
