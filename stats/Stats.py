@@ -17,16 +17,16 @@ class Stats():
 	def initStats(self):	
 		self.hostinfo = []
 		self.workloadinfo = []
-		self.activecontainerinfo = []
-		self.allcontainerinfo = []
+		self.alltaskinfo = []
 		self.metrics = []
 		self.schedulerinfo = []
+		self.deciderinfo = []
 
 	def saveHostInfo(self):
 		hostinfo = dict()
 		hostinfo['interval'] = self.env.interval
 		hostinfo['cpu'] = [host.getCPU() for host in self.env.hostlist]
-		hostinfo['numcontainers'] = [len(self.env.getContainersOfHost(i)) for i,host in enumerate(self.env.hostlist)]
+		hostinfo['numcontainers'] = [len(self.env.getTasksofHost(i)) for i,host in enumerate(self.env.hostlist)]
 		hostinfo['power'] = [host.getPower() for host in self.env.hostlist]
 		hostinfo['baseips'] = [host.getBaseIPS() for host in self.env.hostlist]
 		hostinfo['ipsavailable'] = [host.getIPSAvailable() for host in self.env.hostlist]
@@ -38,131 +38,79 @@ class Stats():
 		hostinfo['diskavailable'] = [host.getDiskAvailable() for host in self.env.hostlist]
 		self.hostinfo.append(hostinfo)
 
-	def saveWorkloadInfo(self, deployed, migrations):
+	def saveWorkloadInfo(self, numdep):
 		workloadinfo = dict()
 		workloadinfo['interval'] = self.env.interval
-		workloadinfo['totalcontainers'] = len(self.workload.createdContainers)
+		workloadinfo['completedtasks'] = len(self.env.completedtasklist)
+		workloadinfo['activetasks'] = len(self.env.activetasklist)
+		workloadinfo['totaltasks'] = len(self.env.completedtasklist) + len(self.env.activetasklist)
 		if self.workloadinfo != []:
-			workloadinfo['newcontainers'] = workloadinfo['totalcontainers'] - self.workloadinfo[-1]['totalcontainers'] 
+			workloadinfo['newtasks'] = workloadinfo['totaltasks'] - self.workloadinfo[-1]['totaltasks'] 
 		else:
-			workloadinfo['newcontainers'] = workloadinfo['totalcontainers']
-		workloadinfo['deployed'] = len(deployed)
-		workloadinfo['migrations'] = len(migrations)
-		workloadinfo['inqueue'] = len(self.workload.getUndeployedContainers())
+			workloadinfo['newtasks'] = workloadinfo['totaltasks']
+		workloadinfo['deployed'] = numdep
+		workloadinfo['inqueue'] = len(self.env.waitinglist)
 		self.workloadinfo.append(workloadinfo)
 
-	def saveContainerInfo(self):
-		containerinfo = dict()
-		containerinfo['interval'] = self.env.interval
-		containerinfo['activecontainers'] = self.env.getNumActiveContainers()
-		containerinfo['ips'] = [(c.getBaseIPS() if c else 0) for c in self.env.containerlist]
-		containerinfo['apparentips'] = [(c.getApparentIPS() if c else 0) for c in self.env.containerlist]
-		containerinfo['ram'] = [(c.getRAM() if c else 0) for c in self.env.containerlist]
-		containerinfo['disk'] = [(c.getDisk() if c else 0) for c in self.env.containerlist]
-		containerinfo['creationids'] = [(c.creationID if c else -1) for c in self.env.containerlist]
-		containerinfo['hostalloc'] = [(c.getHostID() if c else -1) for c in self.env.containerlist]
-		containerinfo['active'] = [(c.active if c else False) for c in self.env.containerlist]
-		self.activecontainerinfo.append(containerinfo)
+	def saveAllTaskInfo(self):
+		self.alltaskinfo = []
+		for task in self.env.completedtasklist:
+			taskinfo = dict()
+			taskinfo['createAt'] = task.createAt
+			taskinfo['startAt'] = task.startAt
+			taskinfo['destroyAt'] = task.destroyAt
+			taskinfo['creationID'] = task.creationID
+			taskinfo['taskID'] = task.taskID
+			taskinfo['application'] = task.application
+			taskinfo['hostid'] = task.hostid
+			taskinfo['choice'] = task.choice
+			self.alltaskinfo.append(taskinfo)
 
-	def saveAllContainerInfo(self):
-		containerinfo = dict()
-		allCreatedContainers = [self.env.getContainerByCID(cid) for cid in list(np.where(self.workload.deployedContainers)[0])]
-		containerinfo['interval'] = self.env.interval
-		if self.datacenter.__class__.__name__ == 'Datacenter':
-			containerinfo['application'] = [self.env.getContainerByCID(cid).application for cid in list(np.where(self.workload.deployedContainers)[0])]
-		containerinfo['ips'] = [(c.getBaseIPS() if c.active else 0) for c in allCreatedContainers]
-		containerinfo['create'] = [(c.createAt) for c in allCreatedContainers]
-		containerinfo['start'] = [(c.startAt) for c in allCreatedContainers]
-		containerinfo['destroy'] = [(c.destroyAt) for c in allCreatedContainers]
-		containerinfo['apparentips'] = [(c.getApparentIPS() if c.active else 0) for c in allCreatedContainers]
-		containerinfo['ram'] = [(c.getRAM() if c.active else 0) for c in allCreatedContainers]
-		containerinfo['disk'] = [(c.getDisk() if c.active else 0) for c in allCreatedContainers]
-		containerinfo['hostalloc'] = [(c.getHostID() if c.active else -1) for c in allCreatedContainers]
-		containerinfo['active'] = [(c.active) for c in allCreatedContainers]
-		self.allcontainerinfo.append(containerinfo)
-
-	def saveMetrics(self, destroyed, migrations):
+	def saveMetrics(self, destroyed):
 		metrics = dict()
 		metrics['interval'] = self.env.interval
 		metrics['numdestroyed'] = len(destroyed)
-		metrics['nummigrations'] = len(migrations)
 		metrics['energy'] = [host.getPower()*self.env.intervaltime for host in self.env.hostlist]
 		metrics['energytotalinterval'] = np.sum(metrics['energy'])
-		metrics['energypercontainerinterval'] = np.sum(metrics['energy'])/self.env.getNumActiveContainers()
-		metrics['responsetime'] = [c.totalExecTime + c.totalMigrationTime for c in destroyed]
+		metrics['energypertaskinterval'] = np.sum(metrics['energy'])/self.env.getNumActiveTasks()
+		metrics['responsetime'] = [c.destroyAt + c.createAt for c in destroyed]
 		metrics['avgresponsetime'] = np.average(metrics['responsetime']) if len(destroyed) > 0 else 0
-		metrics['migrationtime'] = [c.totalMigrationTime for c in destroyed]
-		metrics['avgmigrationtime'] = np.average(metrics['migrationtime']) if len(destroyed) > 0 else 0
-		metrics['slaviolations'] = len(np.where([c.destroyAt > c.sla for c in destroyed]))
-		metrics['slaviolationspercentage'] = metrics['slaviolations'] * 100.0 / len(destroyed) if len(destroyed) > 0 else 0
+		metrics['exectime'] = [c.destroyAt - c.startAt for c in destroyed]
+		metrics['avgexectime'] = np.average(metrics['exectime']) if len(destroyed) > 0 else 0
 		metrics['waittime'] = [c.startAt - c.createAt for c in destroyed]
-		metrics['energytotalinterval_pred'], metrics['avgresponsetime_pred'] = self.runSimulationGOBI()
+		metrics['avgwaittime'] = np.average(metrics['waittime']) if len(destroyed) > 0 else 0
+		metrics['slaviolations'] = len(np.where([c.destroyAt > c.sla + c.createAt for c in destroyed])[0])
+		metrics['slaviolationspercentage'] = metrics['slaviolations'] * 100.0 / len(destroyed) if len(destroyed) > 0 else 0
 		self.metrics.append(metrics)
 
-	def saveSchedulerInfo(self, selectedcontainers, decision, schedulingtime):
+	def saveSchedulerInfo(self, decision, schedulingtime):
 		schedulerinfo = dict()
 		schedulerinfo['interval'] = self.env.interval
-		schedulerinfo['selection'] = selectedcontainers
-		schedulerinfo['decision'] = decision
-		schedulerinfo['schedule'] = [(c.id, c.getHostID()) if c else (None, None) for c in self.env.containerlist]
+		schedulerinfo['decision'] = [int(d) for d in decision]
+		schedulerinfo['schedule'] = [(c.creationID, c.taskID, c.getHostID()) for c in self.env.activetasklist]
 		schedulerinfo['schedulingtime'] = schedulingtime
-		if self.datacenter.__class__.__name__ == 'Datacenter':
-			schedulerinfo['migrationTime'] = self.env.intervalAllocTimings[-1]
 		self.schedulerinfo.append(schedulerinfo)
 
-	def saveStats(self, deployed, migrations, destroyed, selectedcontainers, decision, schedulingtime):	
+	def saveDeciderInfo(self, newtasklist):
+		deciderinfo = dict()
+		deciderinfo['interval'] = self.env.interval
+		deciderinfo['applications'] = [task.application for task in newtasklist]
+		deciderinfo['choices'] = [task.choice for task in newtasklist]
+		self.deciderinfo.append(deciderinfo)
+
+	def saveStats(self, numdep, destroyed, newtasklist, decision, schedulingtime):	
 		self.saveHostInfo()
-		self.saveWorkloadInfo(deployed, migrations)
-		self.saveContainerInfo()
-		self.saveAllContainerInfo()
-		self.saveMetrics(destroyed, migrations)
-		self.saveSchedulerInfo(selectedcontainers, decision, schedulingtime)
-
-	def runSimpleSimulation(self, decision):
-		host_alloc = []; container_alloc = [-1] * len(self.env.hostlist)
-		for i in range(len(self.env.hostlist)):
-			host_alloc.append([])
-		for c in self.env.containerlist:
-			if c and c.getHostID() != -1: 
-				host_alloc[c.getHostID()].append(c.id) 
-				container_alloc[c.id] = c.getHostID()
-		decision = self.simulated_scheduler.filter_placement(decision)
-		for cid, hid in decision:
-			if self.env.getPlacementPossible(cid, hid) and container_alloc[cid] != -1:
-				host_alloc[container_alloc[cid]].remove(cid)
-				host_alloc[hid].append(cid)
-		energytotalinterval_pred = 0
-		for hid, cids in enumerate(host_alloc):
-			ips = 0
-			for cid in cids: ips += self.env.containerlist[cid].getApparentIPS()
-			energytotalinterval_pred += self.env.hostlist[hid].getPowerFromIPS(ips)
-		return energytotalinterval_pred*self.env.intervaltime, max(0, np.mean([metric_d['avgresponsetime'] for metric_d in self.metrics[-5:]]))
-
-	def runSimulationGOBI(self):
-		host_alloc = []; container_alloc = [-1] * len(self.env.hostlist)
-		for i in range(len(self.env.hostlist)):
-			host_alloc.append([])
-		for c in self.env.containerlist:
-			if c and c.getHostID() != -1: 
-				host_alloc[c.getHostID()].append(c.id) 
-				container_alloc[c.id] = c.getHostID()
-		selected = self.simulated_scheduler.selection()
-		decision = self.simulated_scheduler.filter_placement(self.simulated_scheduler.placement(selected))
-		for cid, hid in decision:
-			if self.env.getPlacementPossible(cid, hid) and container_alloc[cid] != -1:
-				host_alloc[container_alloc[cid]].remove(cid)
-				host_alloc[hid].append(cid)
-		energytotalinterval_pred = 0
-		for hid, cids in enumerate(host_alloc):
-			ips = 0
-			for cid in cids: ips += self.env.containerlist[cid].getApparentIPS()
-			energytotalinterval_pred += self.env.hostlist[hid].getPowerFromIPS(ips)
-		return energytotalinterval_pred*self.env.intervaltime, max(0, np.mean([metric_d['avgresponsetime'] for metric_d in self.metrics[-5:]]))
+		self.saveWorkloadInfo(numdep)
+		self.saveAllTaskInfo()
+		self.saveMetrics(destroyed)
+		self.saveSchedulerInfo(decision, schedulingtime)
+		self.saveDeciderInfo(newtasklist)
 
 	########################################################################################################
 
 	def generateGraphsWithInterval(self, dirname, listinfo, obj, metric, metric2=None):
 		fig, axes = plt.subplots(len(listinfo[0][metric]), 1, sharex=True,figsize=(4, 0.5*len(listinfo[0][metric])))
+		axes = [axes] if len(listinfo[0][metric]) == 1 else axes
 		title = obj + '_' + metric + '_with_interval' 
 		totalIntervals = len(listinfo)
 		x = list(range(totalIntervals))
@@ -185,11 +133,11 @@ class Stats():
 		plt.savefig(dirname + '/' + title + '.pdf')
 
 	def generateMetricsWithInterval(self, dirname):
-		fig, axes = plt.subplots(9, 1, sharex=True, figsize=(4, 5))
+		fig, axes = plt.subplots(8, 1, sharex=True, figsize=(4, 5))
 		x = list(range(len(self.metrics)))
 		res = {}
-		for i,metric in enumerate(['numdestroyed', 'nummigrations', 'energytotalinterval', 'avgresponsetime',\
-			 'avgmigrationtime', 'slaviolations', 'slaviolationspercentage', 'waittime', 'energypercontainerinterval']):
+		for i,metric in enumerate(['numdestroyed', 'energytotalinterval', 'energypertaskinterval', 'avgresponsetime',\
+			 'avgexectime', 'avgwaittime', 'slaviolations', 'slaviolationspercentage']):
 			metric_with_interval = [self.metrics[i][metric] for i in range(len(self.metrics))] if metric != 'waittime' else \
 				[sum(self.metrics[i][metric]) for i in range(len(self.metrics))]
 			axes[i].plot(x, metric_with_interval)
@@ -202,10 +150,21 @@ class Stats():
 		plt.savefig(dirname + '/' + 'Metrics' + '.pdf')
 
 	def generateWorkloadWithInterval(self, dirname):
-		fig, axes = plt.subplots(5, 1, sharex=True, figsize=(4, 5))
+		fig, axes = plt.subplots(6, 1, sharex=True, figsize=(4, 5))
 		x = list(range(len(self.workloadinfo)))
-		for i,metric in enumerate(['totalcontainers', 'newcontainers', 'deployed', 'migrations', 'inqueue']):
+		for i,metric in enumerate(['completedtasks', 'activetasks', 'totaltasks', 'newtasks', 'deployed', 'inqueue']):
 			metric_with_interval = [self.workloadinfo[i][metric] for i in range(len(self.workloadinfo))]
+			axes[i].plot(x, metric_with_interval)
+			axes[i].set_ylabel(metric)
+			axes[i].grid(b=True, which='both', color='#eeeeee', linestyle='-')
+		plt.tight_layout(pad=0)
+		plt.savefig(dirname + '/' + 'Workload' + '.pdf')
+	
+	def generateScheduleWithInterval(self, dirname):
+		fig, axes = plt.subplots(1, 1, sharex=True, figsize=(4, 5))
+		x = list(range(len(self.schedulerinfo)))
+		for i,metric in enumerate(['schedulingtime']):
+			metric_with_interval = [self.schedulerinfo[i][metric] for i in range(len(self.schedulerinfo))]
 			axes[i].plot(x, metric_with_interval)
 			axes[i].set_ylabel(metric)
 			axes[i].grid(b=True, which='both', color='#eeeeee', linestyle='-')
@@ -215,7 +174,7 @@ class Stats():
 	########################################################################################################
 
 	def generateCompleteDataset(self, dirname, data, name):
-		title = name + '_with_interval' 
+		title = name + '_dataset' 
 		metric_with_interval = []
 		headers = list(data[0].keys())
 		for datum in data:
@@ -223,49 +182,31 @@ class Stats():
 		df = pd.DataFrame(metric_with_interval, columns=headers)
 		df.to_csv(dirname + '/' + title + '.csv', index=False)
 
-	def generateDatasetWithInterval(self, dirname, metric, objfunc, metric2=None, objfunc2=None):
-		title = metric + '_' + (metric2 + '_' if metric2 else "") + (objfunc + '_' if objfunc else "") + (objfunc2 + '_' if objfunc2 else "") + 'with_interval' 
+	def generateSimpleHostDatasetWithInterval(self, dirname, metric):
+		title = metric + '_' + 'with_interval' 
 		totalIntervals = len(self.hostinfo)
-		metric_with_interval = []; metric2_with_interval = [] # metric1 is of host and metric2 is of containers
-		host_alloc_with_interval = []; objfunc2_with_interval = []
-		objfunc_with_interval = []
+		metric_with_interval = []
 		for interval in range(totalIntervals-1):
 			metric_with_interval.append([self.hostinfo[interval][metric][hostID] for hostID in range(len(self.hostinfo[0][metric]))])
-			host_alloc_with_interval.append([self.activecontainerinfo[interval]['hostalloc'][cID] for cID in range(len(self.activecontainerinfo[0]['hostalloc']))])
-			objfunc_with_interval.append(self.metrics[interval+1][objfunc])
-			if metric2:
-				metric2_with_interval.append(self.activecontainerinfo[interval][metric2])
-			if objfunc2:
-				objfunc2_with_interval.append(self.metrics[interval+1][objfunc2])
 		df = pd.DataFrame(metric_with_interval)
-		if metric2: df = pd.concat([df, pd.DataFrame(metric2_with_interval)], axis=1)
-		df = pd.concat([df, pd.DataFrame(host_alloc_with_interval)], axis=1)
-		df = pd.concat([df, pd.DataFrame(objfunc_with_interval)], axis=1)
-		if objfunc2: df = pd.concat([df, pd.DataFrame(objfunc2_with_interval)], axis=1)
 		df.to_csv(dirname + '/' + title + '.csv' , header=False, index=False)
 
-	def generateDatasetWithInterval2(self, dirname, metric, metric2, metric3, metric4, objfunc, objfunc2):
-		title = metric + '_' + metric2 + '_'  + metric3 + '_'  + metric4 + '_'  +objfunc + '_' + objfunc2 + '_' + 'with_interval' 
-		totalIntervals = len(self.hostinfo)
-		metric_with_interval = []; metric2_with_interval = [] 
-		metric3_with_interval = []; metric4_with_interval = []
-		host_alloc_with_interval = []; objfunc2_with_interval = []
-		objfunc_with_interval = []
+	def generateSimpleDeciderDatasetWithInterval(self, dirname):
+		title = 'decider' + '_' + 'with_interval' 
+		totalIntervals = len(self.deciderinfo)
+		metric_with_interval = []
 		for interval in range(totalIntervals-1):
-			metric_with_interval.append([self.hostinfo[interval][metric][hostID] for hostID in range(len(self.hostinfo[0][metric]))])
-			host_alloc_with_interval.append([self.activecontainerinfo[interval]['hostalloc'][cID] for cID in range(len(self.activecontainerinfo[0]['hostalloc']))])
-			objfunc_with_interval.append(self.metrics[interval+1][objfunc])
-			metric2_with_interval.append(self.activecontainerinfo[interval][metric2])
-			metric3_with_interval.append(self.metrics[interval][metric3])
-			metric4_with_interval.append(self.metrics[interval][metric4])
-			objfunc2_with_interval.append(self.metrics[interval+1][objfunc2])
+			metric_with_interval.append(self.deciderinfo[interval]['applications'] + self.deciderinfo[interval]['choices'])
 		df = pd.DataFrame(metric_with_interval)
-		df = pd.concat([df, pd.DataFrame(metric2_with_interval)], axis=1)
-		df = pd.concat([df, pd.DataFrame(host_alloc_with_interval)], axis=1)
-		df = pd.concat([df, pd.DataFrame(metric3_with_interval)], axis=1)
-		df = pd.concat([df, pd.DataFrame(metric4_with_interval)], axis=1)
-		df = pd.concat([df, pd.DataFrame(objfunc_with_interval)], axis=1)
-		df = pd.concat([df, pd.DataFrame(objfunc2_with_interval)], axis=1)
+		df.to_csv(dirname + '/' + title + '.csv' , header=False, index=False)
+	
+	def generateSimpleSchedulerDatasetWithInterval(self, dirname):
+		title = 'scheduler' + '_' + 'with_interval' 
+		totalIntervals = len(self.deciderinfo)
+		metric_with_interval = []
+		for interval in range(totalIntervals-1):
+			metric_with_interval.append(self.deciderinfo[interval]['applications'] + self.schedulerinfo[interval]['decision'])
+		df = pd.DataFrame(metric_with_interval)
 		df.to_csv(dirname + '/' + title + '.csv' , header=False, index=False)
 
 	def generateGraphs(self, dirname):
@@ -274,20 +215,19 @@ class Stats():
 		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'power')
 		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'baseips', 'apparentips')
 		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'ipscap', 'apparentips')
-		self.generateGraphsWithInterval(dirname, self.activecontainerinfo, 'container', 'ips', 'apparentips')
-		self.generateGraphsWithInterval(dirname, self.activecontainerinfo, 'container', 'hostalloc')
 		self.generateMetricsWithInterval(dirname)
 		self.generateWorkloadWithInterval(dirname)
 
 	def generateDatasets(self, dirname):
-		# self.generateDatasetWithInterval(dirname, 'cpu', objfunc='energytotalinterval')
-		self.generateDatasetWithInterval(dirname, 'cpu', metric2='apparentips', objfunc='energytotalinterval', objfunc2='avgresponsetime')
-		self.generateDatasetWithInterval2(dirname, 'cpu', 'apparentips', 'energytotalinterval_pred', 'avgresponsetime_pred', objfunc='energytotalinterval', objfunc2='avgresponsetime')
+		self.generateSimpleHostDatasetWithInterval(dirname, 'cpu')
+		self.generateSimpleDeciderDatasetWithInterval(dirname)
+		self.generateSimpleSchedulerDatasetWithInterval(dirname)
 		
 	def generateCompleteDatasets(self, dirname):
 		self.generateCompleteDataset(dirname, self.hostinfo, 'hostinfo')
 		self.generateCompleteDataset(dirname, self.workloadinfo, 'workloadinfo')
 		self.generateCompleteDataset(dirname, self.metrics, 'metrics')
-		self.generateCompleteDataset(dirname, self.activecontainerinfo, 'activecontainerinfo')
-		self.generateCompleteDataset(dirname, self.allcontainerinfo, 'allcontainerinfo')
+		self.generateCompleteDataset(dirname, self.alltaskinfo, 'alltaskinfo')
 		self.generateCompleteDataset(dirname, self.schedulerinfo, 'schedulerinfo')
+		self.generateCompleteDataset(dirname, self.deciderinfo, 'deciderinfo')
+	

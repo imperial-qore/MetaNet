@@ -45,8 +45,7 @@ opts, args = parser.parse_args()
 NUM_SIM_STEPS = 100
 HOSTS = 10
 INTERVAL_TIME = 5 # seconds
-NEW_CONTAINERS = 0
-HOSTS_IP = []
+NEW_TASKS = 0
 
 def initalizeEnvironment(environment, mode):
 	# Initialize simple fog datacenter
@@ -56,7 +55,7 @@ def initalizeEnvironment(environment, mode):
 	
 	# Initialize workload
 	''' Can be AIBench '''
-	workload = AIBenchWorkload(NEW_CONTAINERS, 1.5)
+	workload = AIBenchWorkload(NEW_TASKS, 1.5)
 
 	# Initialize decider
 	''' Can be Random '''
@@ -82,50 +81,48 @@ def initalizeEnvironment(environment, mode):
 
 	# Initialize stats
 	stats = Stats(env, workload, datacenter, scheduler)
-	# stats.saveStats(deployed, migrations, [], deployed, decision, schedulingTime)
+	stats.saveStats(numdep, [], newtasklist, decision, schedulingTime)
 	return datacenter, workload, scheduler, decider, env, stats
 
 def stepSimulation(workload, scheduler, decider, env, stats):
 	workloadlist = workload.generateNewContainers(env.interval) # New containers info
 	newtasklist = decider.decision(workloadlist)
 	decision, schedulingTime = scheduler.placement(env.waitinglist + newtasklist) # Decide placement using task objects
-	numdes = env.destroyCompletedTasks()
+	destroyed = env.destroyCompletedTasks()
 	numdep = env.simulationStep(newtasklist, decision) # Schedule containers
 	print("New Tasks Size:", len(newtasklist))
 	print("Waiting List Size:", len(env.waitinglist))
 	print("Tasks in hosts:", env.getTasksInHosts())
 	print("Deployed:", numdep, "of", len(env.waitinglist + newtasklist))
-	print("Destroyed:", numdes, "of", len(env.activetasklist))
+	print("Destroyed:", len(destroyed), "of", len(env.activetasklist))
 	print("Decision:", decision)
 
-	# stats.saveStats(deployed, migrations, destroyed, selected, decision, schedulingTime)
+	stats.saveStats(numdep, destroyed, newtasklist, decision, schedulingTime)
 
-def saveStats(stats, datacenter, workload, env, end=True):
-	dirname = "logs/" + datacenter.__class__.__name__
-	dirname += "_" + workload.__class__.__name__
-	dirname += "_" + str(NUM_SIM_STEPS) 
-	dirname += "_" + str(HOSTS)
-	dirname += "_" + str(INTERVAL_TIME)
-	dirname += "_" + str(NEW_CONTAINERS)
+def saveStats(stats, dirname, end=True):
+	stats.generateDatasets(dirname)
+	if not end: return
+	stats.generateGraphs(dirname); stats.generateCompleteDatasets(dirname)
+	stats.env, stats.workload, stats.datacenter, stats.scheduler = None, None, None, None
+	with open(dirname + '/stats.pk', 'wb') as handle:  pickle.dump(stats, handle)
+
+if __name__ == '__main__':
+	# Initialize Environment
+	datacenter, workload, scheduler, decider, env, stats = initalizeEnvironment(opts.env, int(opts.mode))
+
+	# Create log directory
+	dirname = "logs/" + decider.__class__.__name__ + '_' + scheduler.__class__.__name__
 	if not os.path.exists("logs"): os.mkdir("logs")
 	if os.path.exists(dirname): shutil.rmtree(dirname, ignore_errors=True)
 	os.mkdir(dirname)
-	stats.generateDatasets(dirname)
-	if not end: return
-	stats.generateGraphs(dirname)
-	stats.generateCompleteDatasets(dirname)
-	stats.env, stats.workload, stats.datacenter, stats.scheduler = None, None, None, None
-	with open(dirname + '/' + dirname.split('/')[1] +'.pk', 'wb') as handle:
-	    pickle.dump(stats, handle)
 
-if __name__ == '__main__':
-	datacenter, workload, scheduler, decider, env, stats = initalizeEnvironment(opts.env, int(opts.mode))
-
+	# Execute steps
 	for step in range(NUM_SIM_STEPS):
 		print(color.GREEN+"Execution Interval:", step, color.ENDC)
 		stepSimulation(workload, scheduler, decider, env, stats)
-		# if step % 10 == 0: saveStats(stats, datacenter, workload, env, end = False)
+		if step % 10 == 0: saveStats(stats, dirname, end = False)
 
+	# Cleanup and save results
 	datacenter.cleanup()
-	# saveStats(stats, datacenter, workload, env)
+	saveStats(stats, dirname)
 

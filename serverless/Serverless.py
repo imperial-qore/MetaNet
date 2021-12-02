@@ -31,7 +31,6 @@ class Serverless():
 		self.environment = env
 		self.addHostlistInit(hostinit)
 		self.globalStartTime = time()
-		self.intervalAllocTimings = []
 	
 	def addHostInit(self, IP, IPS, RAM, Disk, Bw, Powermodel):
 		assert len(self.hostlist) < self.hostlimit
@@ -57,7 +56,7 @@ class Serverless():
 		return self.hostlist[hostID]
 
 	def getNumActiveTasks(self):
-		return len(self.activetasklist())
+		return len(self.activetasklist)
 
 	def getTasksofHost(self, hostID):
 		return [t.creationID for t in self.activetasklist if t.hostid == hostID]
@@ -82,11 +81,10 @@ class Serverless():
 		return np.all(done)
 
 	def destroyCompletedTasks(self):
-		destroyed = 0; toremove = []
+		toremove = []
 		for i, task in enumerate(self.activetasklist):
 			outputexist = [os.path.exists(path) for path in task.output_imgs]
 			if np.all(outputexist):
-				destroyed += 1
 				task.destroy()
 				toremove.append(task)
 				self.completedtasklist.append(task)
@@ -95,7 +93,7 @@ class Serverless():
 				if task.choice == 'layer' and task.taskID == 1:
 					delfiles(task.creationID)
 		for task in toremove: self.activetasklist.remove(task)
-		return destroyed
+		return toremove
 
 	def allocateInit(self, newtasklist, decision):
 		self.interval += 1

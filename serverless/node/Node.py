@@ -17,6 +17,7 @@ class Node():
 		self.bwCap = Bw
 		# Initialize utilization metrics
 		self.ips = 0
+		self.cpu = 0
 		self.ram = RAM(0, 0, 0)
 		self.bw = Bandwidth(0, 0)
 		self.disk = Disk(0, 0, 0)
@@ -29,11 +30,11 @@ class Node():
 		return self.powermodel.power()
 
 	def getPowerFromIPS(self, ips):
-		return self.powermodel.powerFromCPU(min(100, 100 * (ips / self.ipsCap)))
+		return self.powermodel.powerFromCPU(self.getCPU())
 
 	def getCPU(self):
 		# 0 - 100 last interval
-		return min(100, 100 * (self.ips / self.ipsCap))
+		return self.cpu
 
 	def getBaseIPS(self):
 		return self.ips
@@ -60,6 +61,8 @@ class Node():
 
 	def updateUtilizationMetrics(self):
 		host_data = gethostStat(self.ip)
+		print(host_data)
 		self.ips = host_data['cpu'] * self.ipsCap / 100
+		self.cpu = host_data['cpu']
 		self.ram.size = host_data['memory']
 		self.disk.size = host_data['disk']
