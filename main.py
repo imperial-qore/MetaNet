@@ -117,7 +117,7 @@ if __name__ == '__main__':
 	datacenter, workload, scheduler, decider, provisioner, env, stats = initalizeEnvironment(opts.env, int(opts.mode))
 
 	# Create log directory
-	dirname = "logs/" + decider.__class__.__name__ + '_' + scheduler.__class__.__name__
+	dirname = "logs/" + provisioner.__class__.__name__ + '_' + decider.__class__.__name__ + '_' + scheduler.__class__.__name__
 	if not os.path.exists("logs"): os.mkdir("logs")
 	if os.path.exists(dirname): shutil.rmtree(dirname, ignore_errors=True)
 	os.mkdir(dirname)
