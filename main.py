@@ -17,6 +17,7 @@ from serverless.workload.AIBenchWorkload import *
 # Provisioner imports
 from provisioner.Provisioner import Provisioner
 from provisioner.Random_Provisioner import RandomProvisioner
+from provisioner.CoSim_Provisioner import CoSimProvisioner
 
 # Decider imports
 from decider.Random import RandomDecider
@@ -58,8 +59,8 @@ def initalizeEnvironment(environment, mode):
 	workload = AIBenchWorkload(NEW_TASKS, 1.5)
 
 	# Initialize provisioner
-	''' Can be Random '''
-	provisioner = RandomProvisioner() 
+	''' Can be Random, CoSim '''
+	provisioner = CoSimProvisioner() 
 
 	# Initialize decider
 	''' Can be Random '''
