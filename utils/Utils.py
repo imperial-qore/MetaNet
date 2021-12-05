@@ -20,6 +20,15 @@ def printDecisionAndMigrations(decision, migrations):
 		print(',', end='') if i != len(decision)-1 else print(']')
 	print()
 
+def printProvisioned(hostlist):
+	print('Provisioned: [', end='')
+	for i, h in enumerate(hostlist):
+		if not h.enable: print(color.FAIL, end='')
+		print(i, end='')
+		if not h.enable: print(color.ENDC, end='')
+		print(',', end='') if i != len(hostlist)-1 else print(']')
+	print()
+
 def unixify(paths):
 	for path in paths:
 		for file in os.listdir(path):

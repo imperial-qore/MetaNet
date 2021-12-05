@@ -17,7 +17,7 @@ class CoSimProvisioner(Provisioner):
 		self.util = allips / allipscaps
 
 	def getReward(self):
-		return self.utils - self.gamma * np.sum(self.costs)
+		return self.util - self.gamma * np.sum(self.costs)
 
 	def provision(self):
 		for host in self.env.hostlist:

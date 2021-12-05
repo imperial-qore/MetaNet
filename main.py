@@ -83,7 +83,8 @@ def initalizeEnvironment(environment, mode):
 	print("Waiting List Size:", len(env.waitinglist))
 	print("Tasks in hosts:", env.getTasksInHosts())
 	print("Deployed:", numdep, "of", len(env.waitinglist + newtasklist))
-	print("Decision:", decision)
+	printProvisioned(env.hostlist)
+	print("Schedule:", decision)
 
 	# Initialize stats
 	stats = Stats(env, workload, datacenter, scheduler)
@@ -102,7 +103,8 @@ def stepSimulation(workload, scheduler, decider, provisioner, env, stats):
 	print("Tasks in hosts:", env.getTasksInHosts())
 	print("Deployed:", numdep, "of", len(env.waitinglist + newtasklist))
 	print("Destroyed:", len(destroyed), "of", len(env.activetasklist))
-	print("Decision:", decision)
+	printProvisioned(env.hostlist)
+	print("Schedule:", decision)
 
 	stats.saveStats(numdep, destroyed, newtasklist, decision, schedulingTime)
 
