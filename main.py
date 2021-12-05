@@ -28,6 +28,7 @@ from decider.CoSim_Decider import CoSimDecider
 
 # Scheduler imports
 from scheduler.Random import RandomScheduler
+from scheduler.CoSim_Scheduler import CoSimScheduler
 
 # Auxiliary imports
 from stats.Stats import *
@@ -69,7 +70,7 @@ def initalizeEnvironment(environment, mode):
 
 	# Initialize scheduler
 	''' Can be Random '''
-	scheduler = RandomScheduler() 
+	scheduler = CoSimScheduler() 
 
 	# Initialize Environment
 	env = Serverless(scheduler, decider, provisioner, INTERVAL_TIME, hostlist, environment)

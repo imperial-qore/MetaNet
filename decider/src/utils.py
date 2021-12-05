@@ -36,3 +36,14 @@ def get_accuracies():
         for choice in choices:
             a_dict[app][choice] = accs[app] * choice_multiplier[choice]
     return a_dict
+
+def get_estimate_ips():
+    fname = DATASET_PATH + 'random_stats.pk'
+    with open(fname, 'rb') as handle:
+        stats = pickle.load(handle)
+    ipss = []
+    for hostinfo in stats.hostinfo:
+        for i in range(len(hostinfo['apparentips'])):
+            if hostinfo['numcontainers'][i] > 0:
+                ipss.append(hostinfo['apparentips'][i] / hostinfo['numcontainers'][i])
+    return np.mean(ipss)
