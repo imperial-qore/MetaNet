@@ -65,6 +65,7 @@ class Stats():
 			taskinfo['application'] = task.application
 			taskinfo['hostid'] = task.hostid
 			taskinfo['choice'] = task.choice
+			taskinfo['sla'] = task.sla
 			self.alltaskinfo.append(taskinfo)
 
 	def saveMetrics(self, destroyed):

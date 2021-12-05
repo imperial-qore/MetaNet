@@ -24,6 +24,7 @@ from decider.Random import RandomDecider
 from decider.Layer_Only import LayerOnlyDecider
 from decider.Semantic_Only import SemanticOnlyDecider
 from decider.Compression_Only import CompressionOnlyDecider
+from decider.CoSim_Decider import CoSimDecider
 
 # Scheduler imports
 from scheduler.Random import RandomScheduler
@@ -64,7 +65,7 @@ def initalizeEnvironment(environment, mode):
 
 	# Initialize decider
 	''' Can be Random '''
-	decider = RandomDecider() 
+	decider = CoSimDecider() 
 
 	# Initialize scheduler
 	''' Can be Random '''
@@ -84,6 +85,7 @@ def initalizeEnvironment(environment, mode):
 	print("Tasks in hosts:", env.getTasksInHosts())
 	print("Deployed:", numdep, "of", len(env.waitinglist + newtasklist))
 	printProvisioned(env.hostlist)
+	printDecisions(newtasklist)
 	print("Schedule:", decision)
 
 	# Initialize stats
@@ -104,6 +106,7 @@ def stepSimulation(workload, scheduler, decider, provisioner, env, stats):
 	print("Deployed:", numdep, "of", len(env.waitinglist + newtasklist))
 	print("Destroyed:", len(destroyed), "of", len(env.activetasklist))
 	printProvisioned(env.hostlist)
+	printDecisions(newtasklist)
 	print("Schedule:", decision)
 
 	stats.saveStats(numdep, destroyed, newtasklist, decision, schedulingTime)

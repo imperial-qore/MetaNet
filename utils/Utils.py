@@ -17,8 +17,14 @@ def printDecisionAndMigrations(decision, migrations):
 		if d not in migrations: print(color.FAIL, end='')
 		print(d, end='')
 		if d not in migrations: print(color.ENDC, end='')
-		print(',', end='') if i != len(decision)-1 else print(']')
+		print(', ', end='') if i != len(decision)-1 else print(']')
 	print()
+
+def printDecisions(tasklist):
+	print('Decisions: [', end='')
+	for i, task in enumerate(tasklist):
+		print(f'({task.application}, {task.sla}, {task.choice})', end='')
+		print(', ', end='') if i != len(tasklist)-1 else print(']')
 
 def printProvisioned(hostlist):
 	print('Provisioned: [', end='')
@@ -27,7 +33,6 @@ def printProvisioned(hostlist):
 		print(i, end='')
 		if not h.enable: print(color.ENDC, end='')
 		print(',', end='') if i != len(hostlist)-1 else print(']')
-	print()
 
 def unixify(paths):
 	for path in paths:
