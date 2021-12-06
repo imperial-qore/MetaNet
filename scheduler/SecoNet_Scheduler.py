@@ -1,7 +1,7 @@
-from .Decider import *
+from .Scheduler import *
 from provisioner.src.utils import *
 
-class SecoNetDecider(Decider):
+class SecoNetScheduler(Scheduler):
 	def __init__(self):
 		super().__init__()
 		self.model_name = 'SecoNet'
@@ -16,13 +16,12 @@ class SecoNetDecider(Decider):
 		self.model = self.env.provisioner.model
 		self.model_loaded = True
 
-	def decision(self, workflowlist):
+	def placement(self, tasks):
 		if not self.model_loaded: self.load_model()
+		start = time()
 		memory = self.env.provisioner.memory
-		results = []
-		for CreationID, interval, SLA, application in workflowlist:
-			inp = one_hot(application, self.fn_names)
-			choice = self.choices[torch.argmax(self.model.forward_decider(memory, inp)).item()]
-			tasklist = self.createTasks(CreationID, interval, SLA, application, choice)
-			results += tasklist
-		return results
+		decision = []
+		for task in tasks:
+			inp = one_hot(task.application, self.fn_names)
+			decision.append(torch.argmax(self.model.forward_scheduler(memory, inp)).item())
+		return decision, time() - start

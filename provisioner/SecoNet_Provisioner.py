@@ -8,6 +8,7 @@ class SecoNetProvisioner(Provisioner):
 		self.model_loaded = False
 		self.window_buffer = []
 		self.window = None
+		self.memory = None
 
 	def load_model(self):
 		# Load model
@@ -38,7 +39,7 @@ class SecoNetProvisioner(Provisioner):
 		_, pred = self.model.predwindow(window, window)
 		window_next = pred.view(1, 1, self.feats)
 		memory, _ = self.model.predwindow(window_next, window_next)
-		window_next = pred.view(1, 1, self.feats)
+		self.memory = memory # save for decider and scheduler
 		decisions = [self.model.forward_provisioner(memory, i) for i in self.host_util]
 		for i, decision in enumerate(decisions):
 			todo = torch.argmax(decision).item()

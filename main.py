@@ -31,6 +31,7 @@ from decider.SecoNet_Decider import SecoNetDecider
 # Scheduler imports
 from scheduler.Random import RandomScheduler
 from scheduler.CoSim_Scheduler import CoSimScheduler
+from scheduler.SecoNet_Scheduler import SecoNetScheduler
 
 # Auxiliary imports
 from stats.Stats import *
@@ -71,8 +72,8 @@ def initalizeEnvironment(environment, mode):
 	decider = SecoNetDecider() 
 
 	# Initialize scheduler
-	''' Can be Random '''
-	scheduler = CoSimScheduler() 
+	''' Can be Random, SecoNet '''
+	scheduler = SecoNetScheduler() 
 
 	# Initialize Environment
 	env = Serverless(scheduler, decider, provisioner, INTERVAL_TIME, hostlist, environment)
