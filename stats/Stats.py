@@ -105,7 +105,7 @@ class Stats():
 		self.saveWorkloadInfo(numdep)
 		self.saveAllTaskInfo()
 		self.saveMetrics(destroyed)
-		self.saveSchedulerInfo(decision, schedulingtime)
+		self.saveSchedulerInfo(decision[-len(newtasklist):] if newtasklist else [], schedulingtime)
 		self.saveDeciderInfo(newtasklist)
 
 	########################################################################################################

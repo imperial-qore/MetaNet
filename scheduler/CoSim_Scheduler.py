@@ -10,7 +10,7 @@ class CoSimScheduler(Scheduler):
 		self.rt_dict, self.sla_dict = get_dicts()
 		self.emax = 0
 		self.estimateTaskIPS = get_estimate_ips(); 
-		print('Estimate Task IPS:', estimateTaskIPS)
+		print('Estimate Task IPS:', self.estimateTaskIPS)
 
 	def runSimpleSimulation(self, task, hostID):
 		ehosts = []; 

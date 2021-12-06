@@ -1,6 +1,8 @@
 # SECO
 Serverless Co-Design Framework.
 
+"SecoNet: Co-Design of Serverless Edge Computing Environments"
+
 
    <a href="https://gitpod.io/#https://github.com/shreshthtuli/SECO/">
     <img src="https://gitpod.io/button/open-in-gitpod.svg" alt="Open in gitpod">
@@ -38,6 +40,8 @@ http http://<public_ip>:7071/api/onnx @debug/babyyoda.jpg > output.jpg
 ```
 
 # Details and motivation
+
+We call the NN as SecoNet (Serverless Co-Design Network). We call the learning process as CILP (from IJCAI paper). 
 
 For cosim optimization parameters:
 - provisioner: tradeoff between utilization ratio and cost
