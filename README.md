@@ -39,4 +39,11 @@ http http://<public_ip>:7071/api/onnx @debug/babyyoda.jpg > output.jpg
 
 # Details and motivation
 
-For cosim provisioner: tradeoff between utilization ratio and cost, decider: sla ciolation and accuracy, scheduler: qos.
+For cosim optimization parameters:
+- provisioner: tradeoff between utilization ratio and cost
+- decider: sla ciolation and accuracy
+- scheduler: qos.
+
+Baselines: 
+- SOTA provisioner+decider+scheduler
+- other co-design methods
