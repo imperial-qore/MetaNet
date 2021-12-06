@@ -1,5 +1,5 @@
 from .Provisioner import *
-from .src.utils import *
+from provisioner.src.utils import *
 
 class SecoNetProvisioner(Provisioner):
 	def __init__(self):
@@ -16,7 +16,7 @@ class SecoNetProvisioner(Provisioner):
 		# Load dataset
 		train_cpu, test_cpu = load_cpu_dataset(self.feats)
 		train_provisioner, test_provisioner = load_provisioner_dataset(self.feats)
-		train_decider, test_decider = load_decider_dataset(self.feats);
+		train_decider, test_decider = load_decider_dataset(self.feats)
 		train_scheduler, test_scheduler = load_scheduler_dataset(self.feats)
 		# Train model 
 		if epoch == -1:
@@ -35,7 +35,7 @@ class SecoNetProvisioner(Provisioner):
 		self.host_util = torch.FloatTensor([h.getCPU() for h in self.env.hostlist]) / 100
 		feats = len(self.env.hostlist)
 		window = self.host_util.view(1, 1, feats)
-		memory, pred = self.model(window, elem, torch.tensor([sum(self.host_util)]))
+		memory, pred = self.model.predwindow(window, elem)
 		pred = pred.view(-1).tolist()
 		return pred.tolist()
 
@@ -44,14 +44,11 @@ class SecoNetProvisioner(Provisioner):
 		self.host_util = torch.FloatTensor([h.getCPU() for h in self.env.hostlist]) / 100
 		feats = len(self.env.hostlist)
 		window = self.host_util.view(1, 1, feats)
-		_, pred = self.model(window, window, torch.tensor([sum(self.host_util)]))
+		_, pred = self.model.predwindow(window, window)
 		window_next = pred.view(1, 1, feats)
-		memory, _ = self.model(window_next, window_next, torch.tensor([sum(self.host_util)]))
+		memory, _ = self.model.predwindow(window_next, window_next)
 		window_next = pred.view(1, 1, feats)
-		decisions = [model.forward_provisioner(memory, i) for i in self.host_util]
-		for decision in decision:
+		decisions = [self.model.forward_provisioner(memory, i) for i in self.host_util]
+		for i, decision in enumerate(decisions):
 			todo = torch.argmax(decision).item()
-			if todo == 1:
-				host.enable = True
-			else:
-				host.enable = False
+			self.env.hostlist[i].enable = True if todo == 1 else False
