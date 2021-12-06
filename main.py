@@ -26,6 +26,7 @@ from decider.Layer_Only import LayerOnlyDecider
 from decider.Semantic_Only import SemanticOnlyDecider
 from decider.Compression_Only import CompressionOnlyDecider
 from decider.CoSim_Decider import CoSimDecider
+from decider.SecoNet_Decider import SecoNetDecider
 
 # Scheduler imports
 from scheduler.Random import RandomScheduler
@@ -66,8 +67,8 @@ def initalizeEnvironment(environment, mode):
 	provisioner = SecoNetProvisioner() 
 
 	# Initialize decider
-	''' Can be Random '''
-	decider = CoSimDecider() 
+	''' Can be Random, SecoNet '''
+	decider = SecoNetDecider() 
 
 	# Initialize scheduler
 	''' Can be Random '''

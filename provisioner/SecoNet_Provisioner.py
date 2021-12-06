@@ -31,23 +31,14 @@ class SecoNetProvisioner(Provisioner):
 		freeze(self.model)
 		self.model_loaded = True
 
-	def prediction(self):
-		self.host_util = torch.FloatTensor([h.getCPU() for h in self.env.hostlist]) / 100
-		feats = len(self.env.hostlist)
-		window = self.host_util.view(1, 1, feats)
-		memory, pred = self.model.predwindow(window, elem)
-		pred = pred.view(-1).tolist()
-		return pred.tolist()
-
 	def provision(self):
 		if not self.model_loaded: self.load_model()
 		self.host_util = torch.FloatTensor([h.getCPU() for h in self.env.hostlist]) / 100
-		feats = len(self.env.hostlist)
-		window = self.host_util.view(1, 1, feats)
+		window = self.host_util.view(1, 1, self.feats)
 		_, pred = self.model.predwindow(window, window)
-		window_next = pred.view(1, 1, feats)
+		window_next = pred.view(1, 1, self.feats)
 		memory, _ = self.model.predwindow(window_next, window_next)
-		window_next = pred.view(1, 1, feats)
+		window_next = pred.view(1, 1, self.feats)
 		decisions = [self.model.forward_provisioner(memory, i) for i in self.host_util]
 		for i, decision in enumerate(decisions):
 			todo = torch.argmax(decision).item()
