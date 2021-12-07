@@ -42,6 +42,8 @@ http http://<public_ip>:7071/api/onnx @debug/babyyoda.jpg > output.jpg
 # Details and motivation
 
 We call the NN as SecoNet (Serverless Co-Design Network). We call the learning process as CILP (from IJCAI paper). 
+- We run co-simulated runs to generate gold (similar to A/B testing)
+- We can not run co-simulation for each action at runtime as it takes much longer than 5 seconds (typical interval duration in serverless)
 
 For cosim optimization parameters:
 - provisioner: tradeoff between utilization ratio and cost
