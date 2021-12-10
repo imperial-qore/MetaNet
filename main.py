@@ -19,6 +19,7 @@ from provisioner.Provisioner import Provisioner
 from provisioner.Random_Provisioner import RandomProvisioner
 from provisioner.CoSim_Provisioner import CoSimProvisioner
 from provisioner.SecoNet_Provisioner import SecoNetProvisioner
+from provisioner.ACOARIMA_Provisioner import ACOARIMAProvisioner
 
 # Decider imports
 from decider.Random import RandomDecider
@@ -38,13 +39,15 @@ from stats.Stats import *
 from utils.Utils import *
 from pdb import set_trace as bp
 
-usage = "usage: python main.py -e <environment> -m <mode> # empty environment run simulator"
+usage = "usage: python main.py -e <environment> -t <type> -m <model>"
 
 parser = optparse.OptionParser(usage=usage)
 parser.add_option("-e", "--environment", action="store", dest="env", default="", 
 					help="Environment is Azure or VLAN.")
-parser.add_option("-m", "--mode", action="store", dest="mode", default="0", 
-					help="Mode is 0 (Create and destroy), 1 (Create), 2 (No op), 3 (Destroy)")
+parser.add_option("-t", "--type", action="store", dest="type", default="0", 
+					help="Type is 0 (Create and destroy), 1 (Create), 2 (No op), 3 (Destroy)")
+parser.add_option("-m", "--model", action="store", dest="model", default="0", 
+					help="Model is one of Random, CoSim, ACOARIMA, Seco")
 opts, args = parser.parse_args()
 
 # Global constants
@@ -53,10 +56,10 @@ HOSTS = 10
 INTERVAL_TIME = 5 # seconds
 NEW_TASKS = 0
 
-def initalizeEnvironment(environment, mode):
+def initalizeEnvironment(environment, type, model):
 	# Initialize simple fog datacenter
 	''' Can be AzureDatacenter '''
-	datacenter = eval(environment+'Datacenter(mode)')
+	datacenter = eval(environment+'Datacenter(type)')
 	hostlist = datacenter.generateHosts()
 	
 	# Initialize workload
@@ -64,15 +67,12 @@ def initalizeEnvironment(environment, mode):
 	workload = AIBenchWorkload(NEW_TASKS, 1.5)
 
 	# Initialize provisioner
-	''' Can be Random, CoSim, SecoNet '''
-	provisioner = SecoNetProvisioner() 
+	provisioner = eval(model+'Provisioner()')
 
 	# Initialize decider
-	''' Can be Random, SecoNet '''
 	decider = SecoNetDecider() 
 
 	# Initialize scheduler
-	''' Can be Random, SecoNet '''
 	scheduler = SecoNetScheduler() 
 
 	# Initialize Environment
@@ -124,7 +124,7 @@ def saveStats(stats, dirname, end=True):
 
 if __name__ == '__main__':
 	# Initialize Environment
-	datacenter, workload, scheduler, decider, provisioner, env, stats = initalizeEnvironment(opts.env, int(opts.mode))
+	datacenter, workload, scheduler, decider, provisioner, env, stats = initalizeEnvironment(opts.env, int(opts.type), opts.model)
 
 	# Create log directory
 	dirname = "logs/" + provisioner.__class__.__name__ + '_' + decider.__class__.__name__ + '_' + scheduler.__class__.__name__
