@@ -44,7 +44,7 @@ class LocalSearch(Opt):
 		for _ in range(50):
 			if newfitness < oldfitness: break
 			oldfitness = newfitness
-			neighbourhood, numadds = self.neighbours(self.decision)
+			neighbourhood = self.neighbours(self.decision)
 			if neighbourhood == []: break
 			if np.random.choice([0, 1], p=[0.6, 0.4]): break
 			fitness = [self.evaluatedecision(n) for n in neighbourhood]

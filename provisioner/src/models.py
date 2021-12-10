@@ -14,9 +14,9 @@ class Attention(nn.Module):
 	def __init__(self, feats):
 		super(Attention, self).__init__()
 		self.name = 'Attention'
-		self.lr = 0.002
+		self.lr = 0.005
 		self.n_feats = feats
-		self.n_window = 5 # MHA w_size = 5
+		self.n_window = 1 # MHA w_size = 5
 		self.n = self.n_feats * self.n_window
 		self.atts = [ nn.Sequential( nn.Linear(self.n, feats * feats), 
 				nn.ReLU(True))	for i in range(1)]
