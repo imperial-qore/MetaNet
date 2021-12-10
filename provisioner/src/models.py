@@ -51,11 +51,11 @@ class NPN(nn.Module):
 		x, s = self.fcn(x)
 		return x, s
 
-## LSTM_AD Model
-class LSTM_AD(nn.Module):
+## LSTM Model
+class LSTM(nn.Module):
 	def __init__(self, feats):
-		super(LSTM_AD, self).__init__()
-		self.name = 'LSTM_AD'
+		super(LSTM, self).__init__()
+		self.name = 'LSTM'
 		self.lr = 0.002
 		self.n_feats = feats
 		self.n_window = 5
