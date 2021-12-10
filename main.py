@@ -71,10 +71,10 @@ def initalizeEnvironment(environment, type, model):
 	provisioner = eval(model+'Provisioner()')
 
 	# Initialize decider
-	decider = SecoNetDecider() 
+	decider = CoSimDecider() 
 
 	# Initialize scheduler
-	scheduler = SecoNetScheduler() 
+	scheduler = CoSimScheduler() 
 
 	# Initialize Environment
 	env = Serverless(scheduler, decider, provisioner, INTERVAL_TIME, hostlist, environment)

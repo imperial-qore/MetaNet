@@ -29,16 +29,11 @@ class Opt:
 		return neighbours
 
 	def evaluatedecision(self, decision):
-		allcaps = [self.env.hostlist[hid].ipsCap for hid in old_hids] + [self.ipscaps[nid] for nid in decision['add']]
+		allcaps = [host.ipsCap for host in self.env.hostlist]
 		allpmodels = [host.powermodel.__class__.__name__ for host in self.env.hostlist]
 		cost = sum([self.costs[host.powermodel.__class__.__name__] for hostID, host in enumerate(self.env.hostlist) if decision[hostID]]) 
 		r = sum(self.ipsdata)  / sum(allcaps)
 		return r - 0.5 * cost
-
-	def getweights(self, fitness, adds):
-		removes = len(fitness) - adds - 1
-		weights = np.array([0.5 / (adds+1e-4)] * adds + [0.5 / (removes+1e-4)] * removes + [0.5])
-		return weights / np.sum(weights)
 
 class LocalSearch(Opt):
 	def __init__(self, ipsdata, env):
@@ -53,7 +48,7 @@ class LocalSearch(Opt):
 			if neighbourhood == []: break
 			if np.random.choice([0, 1], p=[0.6, 0.4]): break
 			fitness = [self.evaluatedecision(n) for n in neighbourhood]
-			index = np.random.choice(list(range(len(fitness))), p=self.getweights(fitness, numadds)) \
+			index = np.random.choice(list(range(len(fitness)))) \
 				if np.random.random() < 0.3 else np.argmax(fitness)
 			self.decision = neighbourhood[index]
 			newfitness = fitness[index]
@@ -66,16 +61,16 @@ class ACO(Opt):
 
 	def search(self):
 		oldfitness = [0] * self.n; newfitness = [1] * self.n
-		self.decisions = [{'remove': [], 'add': []} for _ in range(self.n)]
+		self.decisions = [[1] * len(self.env.hostlist) for _ in range(self.n)]
 		for _ in range(50):
 			for ant in range(self.n):
 				if newfitness[ant] < oldfitness[ant]: continue
 				oldfitness[ant] = newfitness[ant]
-				neighbourhood, numadds = self.neighbours(self.decisions[ant])
+				neighbourhood = self.neighbours(self.decisions[ant])
 				if neighbourhood == []: continue
 				fitness = [self.evaluatedecision(n) for n in neighbourhood]
 				if random.choice([0, 1]): continue
-				index = np.random.choice(list(range(len(fitness))), p=self.getweights(fitness, numadds)) \
+				index = np.random.choice(list(range(len(fitness)))) \
 					if np.random.random() < 0.4 else np.argmax(fitness)
 				self.decisions[ant] = neighbourhood[index]
 				newfitness[ant] = fitness[index]
@@ -94,11 +89,11 @@ class StochasticSearch(Opt):
 		for _ in range(50):
 			if newfitness < oldfitness: break
 			oldfitness = newfitness
-			neighbourhood, numadds = self.neighbours(self.decision)
+			neighbourhood = self.neighbours(self.decision)
 			if np.random.choice([0, 1], p=[0.6, 0.4]): break
 			if neighbourhood == []: break
 			fitness = [self.evaluatedecision(n) for n in neighbourhood]
-			index = np.random.choice(list(range(len(fitness))), p=self.getweights(fitness, numadds)) \
+			index = np.random.choice(list(range(len(fitness)))) \
 				if np.random.random() < 0.2 else np.argmax(fitness)
 			self.decision = neighbourhood[index]
 			newfitness = fitness[index]
@@ -115,7 +110,7 @@ class MABSearch(Opt):
 		for _ in range(50):
 			if newfitness < oldfitness: break
 			oldfitness = newfitness
-			neighbourhood, numadds = self.neighbours(self.decision)
+			neighbourhood = self.neighbours(self.decision)
 			if neighbourhood == []: break
 			if np.random.choice([0, 1], p=[0.25, 0.75]): break
 			fitness = []; weights = []

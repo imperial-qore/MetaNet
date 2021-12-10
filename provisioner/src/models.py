@@ -56,7 +56,7 @@ class LSTM(nn.Module):
 	def __init__(self, feats):
 		super(LSTM, self).__init__()
 		self.name = 'LSTM'
-		self.lr = 0.002
+		self.lr = 0.004
 		self.n_feats = feats
 		self.n_window = 5
 		self.n_hidden = 64
@@ -64,7 +64,7 @@ class LSTM(nn.Module):
 		self.fcn = nn.Sequential(nn.Linear(self.n_hidden, self.n_feats), nn.Sigmoid())
 
 	def forward(self, x):
-		hidden = (torch.rand(1, 1, self.n_hidden, dtype=torch.float64), torch.randn(1, 1, self.n_hidden, dtype=torch.float64))
+		hidden = (torch.rand(1, 1, self.n_hidden, dtype=torch.float), torch.randn(1, 1, self.n_hidden, dtype=torch.float))
 		for i, g in enumerate(x):
 			out, hidden = self.lstm(g.view(1, 1, -1), hidden)
 			out = self.fcn(out.view(-1))

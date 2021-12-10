@@ -165,3 +165,6 @@ def freeze(model):
 def unfreeze(model):
 	for name, p in model.named_parameters():
 		p.requires_grad = True
+
+def hashabledict(dict):
+  return json.dumps(dict)

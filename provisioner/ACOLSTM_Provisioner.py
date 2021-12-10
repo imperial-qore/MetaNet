@@ -10,7 +10,7 @@ class ACOLSTMProvisioner(Provisioner):
 		self.model_loaded = False
 		self.window_buffer = []
 		self.window = None
-		self.memory = None
+		self.model = None
 
 	def load_model(self):
 		# Load model
