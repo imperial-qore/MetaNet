@@ -51,5 +51,6 @@ For cosim optimization parameters:
 - scheduler: qos.
 
 Baselines: 
-- SOTA provisioner+decider+scheduler
-- other co-design methods
+- Predict+Optimization methods: ARIMA+ACO, LSTM+ACO, Decision-NN, Semi-Direct, GRAF (use for each sub-problem).
+- SOTA provisioner+decider+scheduler: UAHS+Gillis+GOSH, CAHS+Gillis+GOSH (UAHS/CAHS dont need estimates, Gillis has lower sched time), Narya+SpliPlace (Narya needs latency estimates that SplitPlace provides).
+- other co-design methods: CES, HASCO, RecSim.
