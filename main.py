@@ -22,6 +22,8 @@ from provisioner.SecoNet_Provisioner import SecoNetProvisioner
 from provisioner.ACOARIMA_Provisioner import ACOARIMAProvisioner
 from provisioner.ACOLSTM_Provisioner import ACOLSTMProvisioner
 from provisioner.DecisionNN_Provisioner import DecisionNNProvisioner
+from provisioner.SemiDirect_Provisioner import SemiDirectProvisioner
+from provisioner.GRAF_Provisioner import GRAFProvisioner
 
 # Decider imports
 from decider.Random import RandomDecider
@@ -44,12 +46,12 @@ from pdb import set_trace as bp
 usage = "usage: python main.py -e <environment> -t <type> -m <model>"
 
 parser = optparse.OptionParser(usage=usage)
-parser.add_option("-e", "--environment", action="store", dest="env", default="", 
+parser.add_option("-e", "--environment", action="store", dest="env", default="Azure", 
 					help="Environment is Azure or VLAN.")
-parser.add_option("-t", "--type", action="store", dest="type", default="0", 
+parser.add_option("-t", "--type", action="store", dest="type", default="2", 
 					help="Type is 0 (Create and destroy), 1 (Create), 2 (No op), 3 (Destroy)")
-parser.add_option("-m", "--model", action="store", dest="model", default="0", 
-					help="Model is one of Random, CoSim, ACOARIMA, Seco")
+parser.add_option("-m", "--model", action="store", dest="model", default="Random", 
+					help="Model is one of Random, CoSim, ACOARIMA, SecoNet")
 opts, args = parser.parse_args()
 
 # Global constants

@@ -22,6 +22,7 @@ seaborn
 tqdm
 httpie
 optparse-pretty
+dgl
 scipy
 matplotlib
 azure-cli-core==2.11.1

@@ -111,6 +111,9 @@ def backprop(epoch, model, optimizer, scheduler, data_cpu, data_provisioner, dat
 		elif 'Attention' in model.name:
 			pred = model(d)
 			loss = l(pred, gold)
+		elif 'GNN' in model.name:
+			pred = model(d)
+			loss = l(pred, gold)
 		elif 'Transformer' in model.name:
 			d = d[None, :]
 			window = d.permute(1, 0, 2)

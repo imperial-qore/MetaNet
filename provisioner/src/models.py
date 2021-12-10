@@ -36,7 +36,7 @@ class NPN(nn.Module):
 		self.name = 'NPN'
 		self.lr = 0.002
 		self.n_feats = feats
-		self.n_window = 5 # MHA w_size = 5
+		self.n_window = 1 # MHA w_size = 5
 		self.n = self.n_feats * self.n_window
 		self.fcn = nn.Sequential( 
 			NPNLinear(self.n, feats, False), 
@@ -50,6 +50,43 @@ class NPN(nn.Module):
 		x = g.reshape(1, -1)
 		x, s = self.fcn(x)
 		return x, s
+
+# Graph Neural Network
+class GNN(nn.Module):
+	def __init__(self, feats):
+		super(GNN, self).__init__()
+		self.name = 'GNN'
+		self.lr = 0.0001
+		self.n_feats = feats
+		self.n_window = 1
+		self.n_hidden = 16
+		self.n = self.n_window * self.n_feats
+		src_ids = np.repeat(np.array(list(range(feats))), feats)
+		dst_ids = np.array(list(range(feats))*feats)
+		self.g = dgl.graph((torch.tensor(src_ids), torch.tensor(dst_ids)))
+		self.g = dgl.add_self_loop(self.g)
+		self.feature_gat = GATConv(1, 1, feats)
+		self.attention = nn.Sequential(
+			nn.Linear(self.n, self.n_hidden), nn.LeakyReLU(True),
+			nn.Linear(self.n_hidden, self.n_hidden), nn.LeakyReLU(True),
+			nn.Linear(self.n_hidden, self.n_window), nn.Softmax(dim=0),
+		)
+		self.fcn = nn.Sequential(
+			nn.Linear(self.n_feats, self.n_hidden), nn.LeakyReLU(True),
+			nn.Linear(self.n_hidden, self.n_window), nn.Sigmoid(),
+		)
+
+	def forward(self, data):
+		# Bahdanau style attention
+		att_score = self.attention(data).view(self.n_window, 1)
+		data = data.view(self.n_window, self.n_feats)
+		data_r = torch.matmul(data.permute(1, 0), att_score)
+		# GAT convolution on complete graph
+		feat_r = self.feature_gat(self.g, data_r)
+		feat_r = feat_r.view(self.n_feats, self.n_feats)
+		# Pass through a FCN
+		x = self.fcn(feat_r)
+		return x.view(-1)
 
 ## LSTM Model
 class LSTM(nn.Module):
@@ -77,7 +114,7 @@ class Transformer(nn.Module):
 		self.name = 'Transformer'
 		self.lr = 0.001
 		self.n_feats = feats
-		self.n_window = 10
+		self.n_window = 1
 		self.n = self.n_feats * self.n_window
 		self.pos_encoder = PositionalEncoding(feats, 0.1, self.n_window)
 		encoder_layers = TransformerEncoderLayer(d_model=feats, nhead=feats, dim_feedforward=16, dropout=0.1)

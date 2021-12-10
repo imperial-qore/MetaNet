@@ -3,6 +3,8 @@ import torch
 import torch.nn.functional as F
 from torch.autograd import Variable
 import torch.optim as optim
+import dgl
+from dgl.nn import GATConv
 import math, random
 import numpy as np
 
