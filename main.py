@@ -21,6 +21,7 @@ from provisioner.CoSim_Provisioner import CoSimProvisioner
 from provisioner.SecoNet_Provisioner import SecoNetProvisioner
 from provisioner.ACOARIMA_Provisioner import ACOARIMAProvisioner
 from provisioner.ACOLSTM_Provisioner import ACOLSTMProvisioner
+from provisioner.DecisionNN_Provisioner import DecisionNNProvisioner
 
 # Decider imports
 from decider.Random import RandomDecider
