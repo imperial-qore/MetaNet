@@ -24,6 +24,9 @@ from provisioner.ACOLSTM_Provisioner import ACOLSTMProvisioner
 from provisioner.DecisionNN_Provisioner import DecisionNNProvisioner
 from provisioner.SemiDirect_Provisioner import SemiDirectProvisioner
 from provisioner.GRAF_Provisioner import GRAFProvisioner
+from provisioner.UAHS_Provisioner import UAHSProvisioner
+from provisioner.CAHS_Provisioner import CAHSProvisioner
+from provisioner.Narya_Provisioner import NaryaProvisioner
 
 # Decider imports
 from decider.Random import RandomDecider
