@@ -32,7 +32,7 @@ class Opt:
 		allcaps = [self.env.hostlist[hid].ipsCap for hid in old_hids] + [self.ipscaps[nid] for nid in decision['add']]
 		allpmodels = [host.powermodel.__class__.__name__ for host in self.env.hostlist]
 		cost = sum([self.costs[host.powermodel.__class__.__name__] for hostID, host in enumerate(self.env.hostlist) if decision[hostID]]) 
-		r = sum([self.costs[host.ips] for hostID, host in enumerate(self.env.hostlist) if decision[hostID]])  / sum(allcaps)
+		r = sum(self.ipsdata)  / sum(allcaps)
 		return r - 0.5 * cost
 
 	def getweights(self, fitness, adds):
