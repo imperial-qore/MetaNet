@@ -184,6 +184,15 @@ class Stats():
 		df = pd.DataFrame(metric_with_interval, columns=headers)
 		df.to_csv(dirname + '/' + title + '.csv', index=False)
 
+	def generateSimpleMetricsDatasetWithInterval(self, dirname, metric):
+		title = metric + '_' + 'with_interval' 
+		totalIntervals = len(self.hostinfo)
+		metric_with_interval = []
+		for interval in range(totalIntervals-1):
+			metric_with_interval.append(np.mean(self.metrics[interval][metric]))
+		df = pd.DataFrame(metric_with_interval)
+		df.to_csv(dirname + '/' + title + '.csv' , header=False, index=False)
+
 	def generateSimpleHostDatasetWithInterval(self, dirname, metric):
 		title = metric + '_' + 'with_interval' 
 		totalIntervals = len(self.hostinfo)
@@ -224,6 +233,7 @@ class Stats():
 	def generateDatasets(self, dirname):
 		self.generateSimpleHostDatasetWithInterval(dirname, 'cpu')
 		self.generateSimpleHostDatasetWithInterval(dirname, 'enable')
+		self.generateSimpleMetricsDatasetWithInterval(dirname, 'energy')
 		self.generateSimpleDeciderDatasetWithInterval(dirname)
 		self.generateSimpleSchedulerDatasetWithInterval(dirname)
 		

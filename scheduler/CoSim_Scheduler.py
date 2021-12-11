@@ -36,6 +36,5 @@ class CoSimScheduler(Scheduler):
 			scores = [self.runSimpleSimulation(task, hostID) for hostID, _ in enumerate(self.env.hostlist)]
 			for hostID, host in enumerate(self.env.hostlist): # do not schedule on disabled hosts
 				if not host.enable: scores[hostID] = -1000
-			print(scores)
 			decision.append(np.argmax(scores))
 		return decision, time() - start
