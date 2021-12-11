@@ -47,3 +47,6 @@ def get_estimate_ips():
             if hostinfo['numcontainers'][i] > 0:
                 ipss.append(hostinfo['apparentips'][i] / hostinfo['numcontainers'][i])
     return np.mean(ipss)
+    
+def hashabledict(dict):
+  return json.dumps(dict)

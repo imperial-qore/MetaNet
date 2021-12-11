@@ -10,6 +10,7 @@ class ACOARIMAProvisioner(Provisioner):
 		self.model_loaded = False
 		self.window_buffer = []
 		self.window = None
+		self.model = None
 
 	def load_model(self):
 		self.feats = len(self.env.hostlist)

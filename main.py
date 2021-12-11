@@ -35,6 +35,11 @@ from decider.Semantic_Only import SemanticOnlyDecider
 from decider.Compression_Only import CompressionOnlyDecider
 from decider.CoSim_Decider import CoSimDecider
 from decider.SecoNet_Decider import SecoNetDecider
+from decider.ACOARIMA_Decider import ACOARIMADecider
+from decider.ACOLSTM_Decider import ACOLSTMDecider
+from decider.DecisionNN_Decider import DecisionNNDecider
+from decider.SemiDirect_Decider import SemiDirectDecider
+from decider.GRAF_Decider import GRAFDecider
 
 # Scheduler imports
 from scheduler.Random import RandomScheduler
@@ -77,7 +82,7 @@ def initalizeEnvironment(environment, type, model):
 	provisioner = eval(model+'Provisioner()')
 
 	# Initialize decider
-	decider = CoSimDecider() 
+	decider = eval(model+'Decider()')
 
 	# Initialize scheduler
 	scheduler = CoSimScheduler() 

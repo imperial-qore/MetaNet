@@ -14,7 +14,7 @@ class CoSimDecider(Decider):
 		rt_s = [np.random.normal(loc = self.rt_dict[application][choice][0], scale = self.rt_dict[application][choice][1]) for choice in self.choices]
 		sla_s = [rt <= sla for rt in rt_s]
 		a_s = [self.a_dict[application][choice] for choice in self.choices]
-		choice_scores = [sla_s[i] + a_s[i] for i in range(len(self.choices))]
+		choice_scores = [sla_s[i] + self.xi * a_s[i] for i in range(len(self.choices))]
 		# print(sla_s, a_s)
 		return self.choices[np.argmax(choice_scores)]
 
