@@ -45,6 +45,11 @@ from decider.GRAF_Decider import GRAFDecider
 from scheduler.Random import RandomScheduler
 from scheduler.CoSim_Scheduler import CoSimScheduler
 from scheduler.SecoNet_Scheduler import SecoNetScheduler
+from scheduler.ACOARIMA_Scheduler import ACOARIMAScheduler
+from scheduler.ACOLSTM_Scheduler import ACOLSTMScheduler
+from scheduler.DecisionNN_Scheduler import DecisionNNScheduler
+from scheduler.SemiDirect_Scheduler import SemiDirectScheduler
+from scheduler.GRAF_Scheduler import GRAFScheduler
 
 # Auxiliary imports
 from stats.Stats import *
@@ -85,7 +90,7 @@ def initalizeEnvironment(environment, type, model):
 	decider = eval(model+'Decider()')
 
 	# Initialize scheduler
-	scheduler = CoSimScheduler() 
+	scheduler = eval(model+'Scheduler()')
 
 	# Initialize Environment
 	env = Serverless(scheduler, decider, provisioner, INTERVAL_TIME, hostlist, environment)
