@@ -29,7 +29,6 @@ class CoSimScheduler(Scheduler):
 		sla_v = (rt <= sla) + 0
 		return 1 - (self.alpha * e + self.delta * sla_v)
 
-
 	def placement(self, tasks):
 		start = time(); decision = []
 		for task in tasks:

@@ -50,6 +50,7 @@ from scheduler.ACOLSTM_Scheduler import ACOLSTMScheduler
 from scheduler.DecisionNN_Scheduler import DecisionNNScheduler
 from scheduler.SemiDirect_Scheduler import SemiDirectScheduler
 from scheduler.GRAF_Scheduler import GRAFScheduler
+from scheduler.GOBI_Scheduler import GOBIScheduler
 
 # Auxiliary imports
 from stats.Stats import *
@@ -60,11 +61,13 @@ usage = "usage: python main.py -e <environment> -t <type> -m <model>"
 
 parser = optparse.OptionParser(usage=usage)
 parser.add_option("-e", "--environment", action="store", dest="env", default="Azure", 
+					choices=['Azure', 'VLAN'],
 					help="Environment is Azure or VLAN.")
 parser.add_option("-t", "--type", action="store", dest="type", default="2", 
+					choices=['0', '1', '2', '3'],
 					help="Type is 0 (Create and destroy), 1 (Create), 2 (No op), 3 (Destroy)")
 parser.add_option("-m", "--model", action="store", dest="model", default="Random", 
-					help="Model is one of Random, CoSim, ACOARIMA, SecoNet")
+					choices=['Random', 'CoSim', 'ACOARIMA', 'ACOLSTM' 'SecoNet'])
 opts, args = parser.parse_args()
 
 # Global constants
@@ -90,7 +93,7 @@ def initalizeEnvironment(environment, type, model):
 	decider = eval(model+'Decider()')
 
 	# Initialize scheduler
-	scheduler = eval(model+'Scheduler()')
+	scheduler = eval('GOBIScheduler()')
 
 	# Initialize Environment
 	env = Serverless(scheduler, decider, provisioner, INTERVAL_TIME, hostlist, environment)
