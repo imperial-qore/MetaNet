@@ -30,6 +30,12 @@ def backprop(epoch, model, optimizer, scheduler, data_cpu, data_scheduler, data_
 			apps, scheds = data_scheduler[i]
 			preds = torch.stack([model(d, apps[j], scheds[j]) for j in range(len(apps))])
 			loss = l(preds, gold)
+		if 'GOSH' in model.name:
+			apps, scheds = data_scheduler[i]
+			loss = 0
+			for j in range(len(apps)):
+				pred = model(d, apps[j], scheds[j])
+				loss += KL_loss(pred, gold)
 		ls.append(torch.mean(loss).item())
 		if training:
 			optimizer.zero_grad(); loss.backward(); optimizer.step()

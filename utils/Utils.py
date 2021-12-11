@@ -11,6 +11,18 @@ IPS_PATH = './serverless/datacenter/ips.json'
 SAMPLE_PATH = './samples/'
 DSET = list(filter(lambda k: '.md' not in k, os.listdir(SAMPLE_PATH)))
 
+def decompose(model):
+	res = decomposeHelper(model)
+	print(color.BLUE+f'Using {res[0]} provisioner, {res[1]} decider, {res[2]} scheduler.'+color.ENDC)
+	return res
+
+def decomposeHelper(model):
+	if model in ['UAHS', 'CAHS']:
+		return [model, 'Gillis', 'GOSH']
+	elif model in ['Narya']:
+		return [model, 'SplitPlace', 'GOBI']
+	return [model] * 3	
+
 def printDecisionAndMigrations(decision, migrations):
 	print('Decision: [', end='')
 	for i, d in enumerate(decision):

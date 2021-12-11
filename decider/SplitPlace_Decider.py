@@ -10,10 +10,10 @@ class SplitPlaceDecider(Decider):
 	
 	def getChoice(self, application, sla):
 		sla = self.sla_dict[application]
-        # decision between only layer and semantic
+		# decision between only layer and semantic
 		rt_s = np.random.normal(loc = self.rt_dict[application]['layer'][0], scale = self.rt_dict[application]['layer'][1])
 		if sla < rt_s:
-            return 'semantic'
+			return 'semantic'
 		return 'layer'
 
 	def decision(self, workflowlist):

@@ -40,6 +40,8 @@ from decider.ACOLSTM_Decider import ACOLSTMDecider
 from decider.DecisionNN_Decider import DecisionNNDecider
 from decider.SemiDirect_Decider import SemiDirectDecider
 from decider.GRAF_Decider import GRAFDecider
+from decider.Gillis_Decider import GillisDecider
+from decider.SplitPlace_Decider import SplitPlaceDecider
 
 # Scheduler imports
 from scheduler.Random import RandomScheduler
@@ -51,6 +53,7 @@ from scheduler.DecisionNN_Scheduler import DecisionNNScheduler
 from scheduler.SemiDirect_Scheduler import SemiDirectScheduler
 from scheduler.GRAF_Scheduler import GRAFScheduler
 from scheduler.GOBI_Scheduler import GOBIScheduler
+from scheduler.GOSH_Scheduler import GOSHScheduler
 
 # Auxiliary imports
 from stats.Stats import *
@@ -67,7 +70,7 @@ parser.add_option("-t", "--type", action="store", dest="type", default="2",
 					choices=['0', '1', '2', '3'],
 					help="Type is 0 (Create and destroy), 1 (Create), 2 (No op), 3 (Destroy)")
 parser.add_option("-m", "--model", action="store", dest="model", default="Random", 
-					choices=['Random', 'CoSim', 'ACOARIMA', 'ACOLSTM' 'SecoNet'])
+					choices=['Random', 'CoSim', 'ACOARIMA', 'ACOLSTM', 'DecisionNN', 'SemiDirect', 'GRAF', 'UAHS', 'CAHS', 'Narya', 'SecoNet'])
 opts, args = parser.parse_args()
 
 # Global constants
@@ -76,7 +79,7 @@ HOSTS = 10
 INTERVAL_TIME = 5 # seconds
 NEW_TASKS = 0
 
-def initalizeEnvironment(environment, type, model):
+def initalizeEnvironment(environment, type, prov, dec, sched):
 	# Initialize simple fog datacenter
 	''' Can be AzureDatacenter '''
 	datacenter = eval(environment+'Datacenter(type)')
@@ -87,13 +90,13 @@ def initalizeEnvironment(environment, type, model):
 	workload = AIBenchWorkload(NEW_TASKS, 1.5)
 
 	# Initialize provisioner
-	provisioner = eval(model+'Provisioner()')
+	provisioner = eval(prov+'Provisioner()')
 
 	# Initialize decider
-	decider = eval(model+'Decider()')
+	decider = eval(dec+'Decider()')
 
 	# Initialize scheduler
-	scheduler = eval('GOBIScheduler()')
+	scheduler = eval(sched+'Scheduler()')
 
 	# Initialize Environment
 	env = Serverless(scheduler, decider, provisioner, INTERVAL_TIME, hostlist, environment)
@@ -144,10 +147,10 @@ def saveStats(stats, dirname, end=True):
 
 if __name__ == '__main__':
 	# Initialize Environment
-	datacenter, workload, scheduler, decider, provisioner, env, stats = initalizeEnvironment(opts.env, int(opts.type), opts.model)
+	datacenter, workload, scheduler, decider, provisioner, env, stats = initalizeEnvironment(opts.env, int(opts.type), *decompose(opts.model))
 
 	# Create log directory
-	dirname = "logs/" + provisioner.__class__.__name__ + '_' + decider.__class__.__name__ + '_' + scheduler.__class__.__name__
+	dirname = "logs/" + opts.model
 	if not os.path.exists("logs"): os.mkdir("logs")
 	if os.path.exists(dirname): shutil.rmtree(dirname, ignore_errors=True)
 	os.mkdir(dirname)

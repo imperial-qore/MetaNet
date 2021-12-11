@@ -1,6 +1,6 @@
 from .Scheduler import *
 from decider.src.utils import *
-from .src.gobi import *
+from .src.gosh import *
 
 class GOSHScheduler(Scheduler):
 	def __init__(self):
@@ -61,6 +61,6 @@ class GOSHScheduler(Scheduler):
 				if not host.enable: scores[hostID] = -1000
 			init_decision = np.argmax(scores)
 			sched = torch.tensor(one_hot(float(init_decision)//1, range(self.feats)), dtype=torch.float, requires_grad=True)
-			sched = gobi_opt(self.model, cpu, app, sched)
+			sched = gosh_opt(self.model, cpu, app, sched)
 			decision.append(torch.argmax(sched).item())
 		return decision, time() - start
