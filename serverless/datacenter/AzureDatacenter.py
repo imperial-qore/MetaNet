@@ -34,8 +34,8 @@ class AzureDatacenter(Datacenter):
           ip = runcmd(f"az vm show -d -g SECO -n {name} --query publicIps -o tsv").strip()
           info = {'ip': ip, 'cpu': getdigit(size), 'powermodel': 'PM'+size.split('_')[1]}
           self.servers.append(info)
-          runcmd(f'rsync -Pav -e "ssh -i ./keys/id_rsa" ./functions/ ansible@{ip}:/home/ansible/functions/')
-          runcmd(f'rsync -Pav -e "ssh -i ./keys/id_rsa" ./serverless/datacenter/agent/ ansible@{ip}:/home/ansible/agent/')
+          runcmd(f'rsync -Pav -e "ssh -o StrictHostKeyChecking=no -i ./keys/id_rsa" ./functions/ ansible@{ip}:/home/ansible/functions/')
+          runcmd(f'rsync -Pav -e "ssh -o StrictHostKeyChecking=no -i ./keys/id_rsa" ./serverless/datacenter/agent/ ansible@{ip}:/home/ansible/agent/')
           runcmd(f"ssh -o StrictHostKeyChecking=no -i ./keys/id_rsa ansible@{ip} 'sudo apt-get -y update'")
           runcmd(f"ssh -o StrictHostKeyChecking=no -i ./keys/id_rsa ansible@{ip} 'sudo apt-get -y install python3-venv python3-pip python3-distutils python3-apt'")
           runcmd(f"ssh -o StrictHostKeyChecking=no -i ./keys/id_rsa ansible@{ip} 'python3 -m pip install psutil'")
