@@ -5,6 +5,7 @@ from torch.autograd import Variable
 import torch.optim as optim
 import dgl
 from dgl.nn import GATConv
+from blitz.modules import BayesianLinear
 import math, random
 import numpy as np
 

@@ -132,7 +132,7 @@ def backprop(epoch, model, optimizer, scheduler, data_cpu, data_provisioner, dat
 		elif 'NPN' in model.name:
 			pred = model(d)
 			loss = KL_loss(pred, gold)
-		elif 'HASCO' in model.name:
+		elif 'HASCO' in model.name or 'RecSim' in model.name:
 			_, p_in = data_provisioner[i]
 			app_in, d_in = data_decider[i]
 			_, s_in = data_scheduler[i]

@@ -28,6 +28,7 @@ from provisioner.UAHS_Provisioner import UAHSProvisioner
 from provisioner.CAHS_Provisioner import CAHSProvisioner
 from provisioner.Narya_Provisioner import NaryaProvisioner
 from provisioner.HASCO_Provisioner import HASCOProvisioner
+from provisioner.RecSim_Provisioner import RecSimProvisioner
 
 # Decider imports
 from decider.Random import RandomDecider
@@ -44,6 +45,7 @@ from decider.GRAF_Decider import GRAFDecider
 from decider.Gillis_Decider import GillisDecider
 from decider.SplitPlace_Decider import SplitPlaceDecider
 from decider.HASCO_Decider import HASCODecider
+from decider.RecSim_Decider import RecSimDecider
 
 # Scheduler imports
 from scheduler.Random import RandomScheduler
@@ -57,6 +59,7 @@ from scheduler.GRAF_Scheduler import GRAFScheduler
 from scheduler.GOBI_Scheduler import GOBIScheduler
 from scheduler.GOSH_Scheduler import GOSHScheduler
 from scheduler.HASCO_Scheduler import HASCOScheduler
+from scheduler.RecSim_Scheduler import RecSimScheduler
 
 # Auxiliary imports
 from stats.Stats import *
@@ -74,7 +77,7 @@ parser.add_option("-t", "--type", action="store", dest="type", default="2",
 					help="Type is 0 (Create and destroy), 1 (Create), 2 (No op), 3 (Destroy)")
 parser.add_option("-m", "--model", action="store", dest="model", default="Random", 
 					choices=['Random', 'CoSim', 'ACOARIMA', 'ACOLSTM', 'DecisionNN', 'SemiDirect',\
-						'GRAF', 'UAHS', 'CAHS', 'Narya', 'HASCO', 'SecoNet'])
+						'GRAF', 'UAHS', 'CAHS', 'Narya', 'HASCO', 'RecSim', 'SecoNet'])
 opts, args = parser.parse_args()
 
 # Global constants
