@@ -62,7 +62,7 @@ class Node():
 
 	def updateUtilizationMetrics(self):
 		host_data = gethostStat(self.ip)
-		print(host_data)
+		# print(host_data)
 		self.ips = host_data['cpu'] * self.ipsCap / 100
 		self.cpu = host_data['cpu'] * 0.8 + self.cpu * 0.2
 		self.ram.size = host_data['memory']
