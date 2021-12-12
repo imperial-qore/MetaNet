@@ -3,7 +3,7 @@ from time import sleep
 
 class AzureDatacenter(Datacenter):
     def __init__(self, mode):
-        self.vmlist = ['Standard_B2s']
+        self.vmlist = ['Standard_B2s'] * 8 + ['Standard_B2ms'] * 8
         super().__init__(mode)
 
     def setupHosts(self):
