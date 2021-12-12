@@ -4,10 +4,10 @@ image:
 tasks:
   - before: >
       chmod 400 keys/id_rsa &&
-      pip install --upgrade pip &&
-      pip install matplotlib scikit-learn &&
-      pip install -r requirements.txt &&
-      pip install torch==1.7.1+cpu torchvision==0.8.2+cpu -f https://download.pytorch.org/whl/torch_stable.html &&
+      pip3 install --upgrade pip &&
+      pip3 install matplotlib scikit-learn &&
+      pip3 install -r requirements.txt &&
+      pip3 install torch==1.7.1+cpu torchvision==0.8.2+cpu -f https://download.pytorch.org/whl/torch_stable.html &&
       export PATH=$PATH:~/.local/bin
     command: echo 'To run code use "python main.py -e Azure -t 1 -m Random"'
 # List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
