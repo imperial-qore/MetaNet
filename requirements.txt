@@ -4,7 +4,6 @@ certifi==2020.6.20
 cycler==0.10.0
 future==0.18.2
 kiwisolver==1.2.0
-matplotlib==3.3.2
 numpy==1.19.2
 pandas==1.1.2
 Pillow==8.1.1
@@ -24,7 +23,10 @@ httpie
 optparse-pretty
 dgl
 scipy
-matplotlib
+-f https://download.pytorch.org/whl/torch_stable.html
+torch==1.7.1+cpu
+-f https://download.pytorch.org/whl/torch_stable.html
+torchvision==0.8.2+cpu
 blitz-bayesian-pytorch
 pykalman
 azure-cli-core==2.11.1
