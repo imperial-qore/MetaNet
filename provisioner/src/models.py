@@ -132,6 +132,22 @@ class Transformer(nn.Module):
 		return x
 
 ## SecoNet Model
+class HASCO(nn.Module):
+	def __init__(self, feats):
+		super(HASCO, self).__init__()
+		self.name = 'HASCO'
+		self.lr = 0.001
+		self.n_feats = feats
+		self.n_window = 1
+		self.n = self.n_feats * self.n_window
+		self.n_apps = 7; self.n_choices = 3
+		self.q = nn.Sequential(nn.Linear(self.n_feats + self.n_apps + 2 + self.n_choices + self.n_feats, 1), nn.Sigmoid())
+
+	def forward(self, cpu, app, prov, dec, sched):
+		score = self.q(torch.cat((cpu.view(-1), app.view(-1), prov.view(-1), dec.view(-1), sched.view(-1))))
+		return score
+
+## SecoNet Model
 class SecoNet(nn.Module):
 	def __init__(self, feats):
 		super(SecoNet, self).__init__()

@@ -27,6 +27,7 @@ from provisioner.GRAF_Provisioner import GRAFProvisioner
 from provisioner.UAHS_Provisioner import UAHSProvisioner
 from provisioner.CAHS_Provisioner import CAHSProvisioner
 from provisioner.Narya_Provisioner import NaryaProvisioner
+from provisioner.HASCO_Provisioner import HASCOProvisioner
 
 # Decider imports
 from decider.Random import RandomDecider
@@ -90,6 +91,7 @@ def initalizeEnvironment(environment, type, prov, dec, sched):
 	workload = AIBenchWorkload(NEW_TASKS, 1.5)
 
 	# Initialize provisioner
+	prov = 'HASCO'
 	provisioner = eval(prov+'Provisioner()')
 
 	# Initialize decider

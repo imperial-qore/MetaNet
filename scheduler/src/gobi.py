@@ -1,7 +1,6 @@
 import os
 from utils.Utils import *
-from provisioner.src.utils import load_cpu_dataset, load_scheduler_dataset, plot_accuracies, one_hot
-from provisioner.src.utils import base_url as base_url_provisioner
+from provisioner.src.utils import load_cpu_dataset, load_scheduler_dataset, load_energy_dataset, plot_accuracies, one_hot
 from .models import *
 from copy import deepcopy
 import numpy as np
@@ -12,20 +11,11 @@ import pickle
 base_url = 'scheduler/src/'
 num_epochs = 10
 
-def load_energy_dataset(feats):
-	fname = base_url_provisioner + f'datasets/energy_with_interval.csv'
-	dset = np.abs(np.genfromtxt(fname, delimiter=',')).reshape(-1, feats)
-	maxe = np.max(dset)
-	dset  = torch.FloatTensor(dset)
-	split = int(0.9 * dset.shape[0])
-	train, test = dset[:split], dset[split:]
-	return train, test, maxe
-
 def backprop(epoch, model, optimizer, scheduler, data_cpu, data_scheduler, data_energy, training = True):
 	feats = data_cpu.shape[1]; ls = []
 	l = nn.MSELoss(reduction = 'mean'); l2 = nn.BCELoss()
 	for i, d in enumerate(data_cpu):
-		gold = data_cpu[i+1][-1] if i+1 < data_cpu.shape[0] else data_cpu[i][-1]
+		gold = data_energy[i]
 		if 'GOBI' in model.name:
 			apps, scheds = data_scheduler[i]
 			preds = torch.stack([model(d, apps[j], scheds[j]) for j in range(len(apps))])

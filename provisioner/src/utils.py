@@ -68,6 +68,15 @@ def load_scheduler_dataset(feats):
 	train, test = dset[:split], dset[split:]
 	return train, test
 
+def load_energy_dataset(feats):
+	fname = base_url + f'datasets/energy_with_interval.csv'
+	dset = np.abs(np.genfromtxt(fname, delimiter=',')).reshape(-1, feats)
+	maxe = np.max(dset)
+	dset  = torch.FloatTensor(dset) / maxe
+	split = int(0.9 * dset.shape[0])
+	train, test = dset[:split], dset[split:]
+	return train, test, maxe
+
 def save_model(model, optimizer, scheduler, epoch, loss_list):
 	folder = base_url + f'checkpoints/'
 	os.makedirs(folder, exist_ok=True)
@@ -100,7 +109,7 @@ def load_model(modelname, dims):
 		epoch = -1; loss_list = []
 	return model, optimizer, scheduler, epoch, loss_list
 
-def backprop(epoch, model, optimizer, scheduler, data_cpu, data_provisioner, data_decider, data_scheduler, training = True):
+def backprop(epoch, model, optimizer, scheduler, data_cpu, data_provisioner, data_decider, data_scheduler, training = True, data_energy = None):
 	feats = data_cpu.shape[1]; ls = []
 	l = nn.MSELoss(reduction = 'mean'); l2 = nn.BCELoss()
 	for i, d in enumerate(data_cpu):
@@ -123,6 +132,18 @@ def backprop(epoch, model, optimizer, scheduler, data_cpu, data_provisioner, dat
 		elif 'NPN' in model.name:
 			pred = model(d)
 			loss = KL_loss(pred, gold)
+		elif 'HASCO' in model.name:
+			_, p_in = data_provisioner[i]
+			app_in, d_in = data_decider[i]
+			_, s_in = data_scheduler[i]
+			preds = []
+			for p in p_in:
+				ps = []
+				for i in range(len(app_in)):
+					app, dec, sched = app_in[i], d_in[i], s_in[i]
+					ps.append(model(d, p, app, dec, sched))
+				preds.append(torch.stack(ps))
+			loss = l(torch.stack(preds), data_energy[i])
 		elif 'Seco' in model.name:
 			# Window prediction
 			window = d.view(1, 1, feats)
