@@ -43,6 +43,7 @@ from decider.SemiDirect_Decider import SemiDirectDecider
 from decider.GRAF_Decider import GRAFDecider
 from decider.Gillis_Decider import GillisDecider
 from decider.SplitPlace_Decider import SplitPlaceDecider
+from decider.HASCO_Decider import HASCODecider
 
 # Scheduler imports
 from scheduler.Random import RandomScheduler
@@ -55,6 +56,7 @@ from scheduler.SemiDirect_Scheduler import SemiDirectScheduler
 from scheduler.GRAF_Scheduler import GRAFScheduler
 from scheduler.GOBI_Scheduler import GOBIScheduler
 from scheduler.GOSH_Scheduler import GOSHScheduler
+from scheduler.HASCO_Scheduler import HASCOScheduler
 
 # Auxiliary imports
 from stats.Stats import *
@@ -71,7 +73,8 @@ parser.add_option("-t", "--type", action="store", dest="type", default="2",
 					choices=['0', '1', '2', '3'],
 					help="Type is 0 (Create and destroy), 1 (Create), 2 (No op), 3 (Destroy)")
 parser.add_option("-m", "--model", action="store", dest="model", default="Random", 
-					choices=['Random', 'CoSim', 'ACOARIMA', 'ACOLSTM', 'DecisionNN', 'SemiDirect', 'GRAF', 'UAHS', 'CAHS', 'Narya', 'SecoNet'])
+					choices=['Random', 'CoSim', 'ACOARIMA', 'ACOLSTM', 'DecisionNN', 'SemiDirect',\
+						'GRAF', 'UAHS', 'CAHS', 'Narya', 'HASCO', 'SecoNet'])
 opts, args = parser.parse_args()
 
 # Global constants
@@ -91,7 +94,6 @@ def initalizeEnvironment(environment, type, prov, dec, sched):
 	workload = AIBenchWorkload(NEW_TASKS, 1.5)
 
 	# Initialize provisioner
-	prov = 'HASCO'
 	provisioner = eval(prov+'Provisioner()')
 
 	# Initialize decider
