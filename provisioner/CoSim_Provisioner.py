@@ -27,7 +27,4 @@ class CoSimProvisioner(Provisioner):
 			self.updateMetrics()
 			rDisable = self.getReward()
 			# use the best variation
-			if rEnable >= rDisable:
-				host.enable = True
-			else:
-				host.enable = False
+			host.enable = rEnable >= rDisable
