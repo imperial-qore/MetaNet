@@ -75,7 +75,7 @@ class Stats():
 		metrics['energy'] = [host.getPower()*self.env.intervaltime for host in self.env.hostlist]
 		metrics['energytotalinterval'] = np.sum(metrics['energy'])
 		metrics['energypertaskinterval'] = np.sum(metrics['energy'])/self.env.getNumActiveTasks()
-		metrics['responsetime'] = [c.destroyAt + c.createAt for c in destroyed]
+		metrics['responsetime'] = [c.destroyAt - c.createAt for c in destroyed]
 		metrics['avgresponsetime'] = np.average(metrics['responsetime']) if len(destroyed) > 0 else 0
 		metrics['exectime'] = [c.destroyAt - c.startAt for c in destroyed]
 		metrics['avgexectime'] = np.average(metrics['exectime']) if len(destroyed) > 0 else 0
