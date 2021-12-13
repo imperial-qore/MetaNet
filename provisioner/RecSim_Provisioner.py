@@ -5,9 +5,9 @@ class RecSimProvisioner(HASCOProvisioner):
 	def __init__(self):
 		super().__init__()
 		self.model_name = 'RecSim'
-		self.allpowermodels = ['PMB2s', 'PMB4ms', 'PMB8ms']
-		costs = np.array([0.08, 0.17, 0.33]) / 12
-		ipscaps = [2019, 4029, 16111]
+		self.allpowermodels = ['PMB2s', 'PMB2ms', 'PMB4ms', 'PMB8ms']
+		costs = np.array([0.08, 0.13, 0.17, 0.33]) / 12
+		ipscaps = [2019, 2019, 4029, 16111]
 		self.costdict = dict(zip(self.allpowermodels, costs))
 		self.ipscaps = dict(zip(self.allpowermodels, ipscaps))
 		self.gamma = 0.5 # weight of cost w.r.t utilization ratio

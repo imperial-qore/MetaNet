@@ -92,8 +92,8 @@ class Serverless():
 				self.completedtasklist.append(task)
 				if task.choice in ['semantic', 'compression']:
 					delfiles(task.creationID, task.taskID)
-				if task.choice == 'layer' and task.taskID == 1:
-					delfiles(task.creationID)
+				# if task.choice == 'layer' and task.taskID == 1:
+				# 	delfiles(task.creationID)
 		for task in toremove: self.activetasklist.remove(task)
 		return toremove
 
