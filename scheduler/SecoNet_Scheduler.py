@@ -23,5 +23,9 @@ class SecoNetScheduler(Scheduler):
 		decision = []
 		for task in tasks:
 			inp = one_hot(task.application, self.fn_names)
-			decision.append(torch.argmax(self.model.forward_scheduler(memory, inp)).item())
+			scores = self.model.forward_scheduler(memory, inp).tolist()
+			# mask disabled hosts
+			for hostID, host in enumerate(self.env.hostlist):
+				if not host.enable: scores[hostID] = 0
+			decision.append(np.argmax(scores))
 		return decision, time() - start

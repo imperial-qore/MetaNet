@@ -170,7 +170,7 @@ class SecoNet(nn.Module):
 	def __init__(self, feats):
 		super(SecoNet, self).__init__()
 		self.name = 'SecoNet'
-		self.lr = 0.001
+		self.lr = 0.002
 		self.n_feats = feats
 		self.n_window = 1
 		self.n = self.n_feats * self.n_window
@@ -181,9 +181,9 @@ class SecoNet(nn.Module):
 		decoder_layers = TransformerDecoderLayer(d_model=feats, nhead=feats, dim_feedforward=16, dropout=0.1)
 		self.transformer_decoder = TransformerDecoder(decoder_layers, 1)
 		self.fcn = nn.Sigmoid()
-		self.likelihood_1 = nn.Sequential(nn.Linear(self.n + 1, 2), nn.Softmax())
-		self.likelihood_2 = nn.Sequential(nn.Linear(self.n_apps + 1, self.n_choices), nn.Softmax())
-		self.likelihood_3 = nn.Sequential(nn.Linear(self.n_apps + 1, feats), nn.Softmax())
+		self.likelihood_1 = nn.Sequential(nn.Linear(1 + feats, 2), nn.Softmax())
+		self.likelihood_2 = nn.Sequential(nn.Linear(self.n_apps + feats, self.n_choices), nn.Softmax())
+		self.likelihood_3 = nn.Sequential(nn.Linear(self.n_apps + feats, feats), nn.Softmax())
 
 	def predwindow(self, src, tgt):
 		src = src * math.sqrt(self.n_feats)
