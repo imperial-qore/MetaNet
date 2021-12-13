@@ -33,7 +33,7 @@ class Opt:
 		allpmodels = [host.powermodel.__class__.__name__ for host in self.env.hostlist]
 		cost = sum([self.costs[host.powermodel.__class__.__name__] for hostID, host in enumerate(self.env.hostlist) if decision[hostID]]) 
 		r = sum(self.ipsdata)  / sum(allcaps)
-		return r - 0.5 * cost
+		return r - 0.2 * cost
 
 class LocalSearch(Opt):
 	def __init__(self, ipsdata, env):

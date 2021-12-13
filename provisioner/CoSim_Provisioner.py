@@ -4,11 +4,11 @@ class CoSimProvisioner(Provisioner):
 	def __init__(self):
 		super().__init__()
 		self.allpowermodels = ['PMB2s', 'PMB2ms', 'PMB4ms', 'PMB8ms']
-		costs = np.array([0.08, 0.13, 0.17, 0.33]) / 12
+		costs = np.array([0.08, 0.12, 0.17, 0.33]) / 12
 		ipscaps = [2019, 2019, 4029, 16111]
 		self.costdict = dict(zip(self.allpowermodels, costs))
 		self.ipscaps = dict(zip(self.allpowermodels, ipscaps))
-		self.gamma = 0.5 # weight of cost w.r.t utilization ratio
+		self.gamma = 0.2 # weight of cost w.r.t utilization ratio
 
 	def updateMetrics(self):
 		self.costs = [self.costdict[host.powermodel.__class__.__name__] if host.enable else 0 for host in self.env.hostlist]
