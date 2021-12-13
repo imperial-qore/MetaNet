@@ -70,7 +70,7 @@ def load_scheduler_dataset(feats):
 
 def load_energy_dataset(feats):
 	fname = base_url + f'datasets/energy_with_interval.csv'
-	dset = np.abs(np.genfromtxt(fname, delimiter=',')).reshape(-1, feats)
+	dset = np.abs(np.genfromtxt(fname, delimiter=',')).reshape(-1, 1)
 	maxe = np.max(dset)
 	dset  = torch.FloatTensor(dset) / maxe
 	split = int(0.9 * dset.shape[0])

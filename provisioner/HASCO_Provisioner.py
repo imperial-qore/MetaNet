@@ -48,8 +48,8 @@ class HASCOProvisioner(Provisioner):
 					d = one_hot(d_choice, d_choices)
 					for s_choice in s_choices:
 						if not sched is None and s_choice != sched: continue
-						sched = one_hot(s_choice, s_choices)
-						scores.append(self.model(cpu, p, app, d, sched))
+						s = one_hot(s_choice, s_choices)
+						scores.append(self.model(cpu, p, app, d, s))
 		return np.mean(scores)
 
 	def provision(self):

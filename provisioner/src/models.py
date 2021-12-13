@@ -49,7 +49,7 @@ class NPN(nn.Module):
 	def forward(self, g):
 		x = g.reshape(1, -1)
 		x, s = self.fcn(x)
-		return x, s
+		return x.view(-1), s.view(-1)
 
 # Graph Neural Network
 class GNN(nn.Module):

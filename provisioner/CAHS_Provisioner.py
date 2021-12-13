@@ -40,6 +40,7 @@ class CAHSProvisioner(Provisioner):
 		if not self.model_loaded: self.load_model()
 		self.host_util = np.array([h.getCPU() for h in self.env.hostlist]) / 100
 		predips, stdips = self.model.predict(self.host_util.reshape(1, -1), return_std=True)
+		predips, stdips = predips.reshape(-1), stdips.reshape(-1)
 		opt = self.search(predips, stdips, self.env)
 		decisions = opt.search()
 		for i, decision in enumerate(decisions):
