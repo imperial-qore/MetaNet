@@ -99,12 +99,12 @@ class LSTM(nn.Module):
 		self.n_hidden = 64
 		self.lstm = nn.LSTM(feats, self.n_hidden)
 		self.fcn = nn.Sequential(nn.Linear(self.n_hidden, self.n_feats), nn.Sigmoid())
+		self.hidden = (torch.rand(1, 1, self.n_hidden, dtype=torch.float), torch.randn(1, 1, self.n_hidden, dtype=torch.float))
 
 	def forward(self, x):
-		hidden = (torch.rand(1, 1, self.n_hidden, dtype=torch.float), torch.randn(1, 1, self.n_hidden, dtype=torch.float))
-		for i, g in enumerate(x):
-			out, hidden = self.lstm(g.view(1, 1, -1), hidden)
-			out = self.fcn(out.view(-1))
+		out, self.hidden = self.lstm(x.view(1, 1, -1), self.hidden)
+		out = self.fcn(out.view(-1))
+		self.hidden = (self.hidden[0].detach(), self.hidden[1].detach())
 		return out
 
 ## Simple Transformer Model

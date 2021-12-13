@@ -24,6 +24,7 @@ class SecoNetScheduler(Scheduler):
 		for task in tasks:
 			inp = one_hot(task.application, self.fn_names)
 			scores = self.model.forward_scheduler(memory, inp).tolist()
+			# scores = scores + np.random.random(len(scores)) # debug
 			# mask disabled hosts
 			for hostID, host in enumerate(self.env.hostlist):
 				if not host.enable: scores[hostID] = 0
