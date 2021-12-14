@@ -16,10 +16,10 @@ System decision making to meet system level objectives by exploiting the synergi
 
 ```console
 # install prerequisites
-sudo apt -y update && apt install -y rsync
-python3 -m pip install --upgrade pip
-python3 -m pip install matplotlib scikit-learn
-python3 -m pip install -r requirements.txt
+sudo apt -y update && sudo apt install -y rsync python3-pip
+pip3 install --upgrade pip
+pip3 install matplotlib scikit-learn
+pip3 install -r requirements.txt
 export PATH=$PATH:~/.local/bin
 sudo chmod 400 keys/id_rsa
 
