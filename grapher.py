@@ -55,10 +55,12 @@ os.makedirs(SAVE_PATH, exist_ok=True)
 plt.rcParams["figure.figsize"] = 3.3,2.5
 
 Models = os.listdir('./logs/')
+Models = [i for i in Models if '_' not in i]
+Models.remove('CES')
 sla_baseline = Models[0]
-ModelsXticks = [i.replace('_', '+').replace('2', '*').replace('Provisioner', '').replace('Scheduler', '').replace('Decider', '') for i in Models]
-rot = 15
-Colors = ['red', 'blue', 'green', 'orange', 'orchid', 'pink', 'cyan']
+ModelsXticks = Models
+rot = 90
+Colors = ['red', 'blue', 'green', 'orange', 'orchid', 'pink', 'cyan'] * 2
 apps = [name for name in os.listdir(FN_PATH) if os.path.isdir(FN_PATH+name)]
 accs = dict(zip(apps, [0.7, 0.8, 0.85, 0.92, 0.97, 0.89, 0.76]))
 choices = ['layer', 'semantic', 'compression']
@@ -88,7 +90,6 @@ for model in Models:
 	with open(file, 'rb') as handle:
 		stats = pickle.load(handle)
 	all_stats_list.append(stats)
-	break
 
 all_stats = dict(zip(Models, all_stats_list))
 
@@ -178,7 +179,7 @@ for ylabel in yLabelsStatic:
 				for task in stats.alltaskinfo:
 					if task['application'] == app:
 						response_time.append((task['destroyAt'] - task['createAt']) * INTERVAL_TIME)
-				response_times.append(np.mean(response_time))
+				response_times.append(np.mean(response_time) if response_time else 0)
 				er = mean_confidence_interval(response_time)
 				errors.append(0 if 'array' in str(type(er)) else er)
 			Data[ylabel][model], CI[ylabel][model] = response_times, errors
@@ -221,7 +222,7 @@ for ylabel in yLabelsStatic:
 			for task in stats.alltaskinfo:
 				start = task['startAt']
 				end = task['destroyAt']
-				d.append(1 / (end - start))
+				if end > start: d.append(1 / (end - start))
 			d = jains_fairness(np.array(d))
 			Data[ylabel][model], CI[ylabel][model] = np.mean(d), np.random.normal(scale=0.05)
 		if ylabel == 'Fairness per application':
@@ -231,7 +232,7 @@ for ylabel in yLabelsStatic:
 				end = task['destroyAt']
 				app = task['application']
 				appid = apps.index(app)
-				d[appid].append(1 / (end - start))
+				if end > start: d[appid].append(1 / (end - start))
 			means = [jains_fairness(np.array(i)) for i in d]
 			devs  = [mean_confidence_interval(i) for i in d]
 			Data[ylabel][model], CI[ylabel][model] = means, devs
