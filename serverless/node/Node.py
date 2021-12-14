@@ -61,7 +61,10 @@ class Node():
 		return self.diskCap.size - size, self.diskCap.read - read, self.diskCap.write - write
 
 	def updateUtilizationMetrics(self):
-		host_data = gethostStat(self.ip)
+		try:
+			host_data = gethostStat(self.ip)
+		except:
+			return
 		# print(host_data)
 		self.ips = host_data['cpu'] * self.ipsCap / 100
 		self.cpu = host_data['cpu'] * 0.8 + self.cpu * 0.2

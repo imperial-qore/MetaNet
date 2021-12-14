@@ -54,10 +54,10 @@ os.makedirs(SAVE_PATH, exist_ok=True)
 
 plt.rcParams["figure.figsize"] = 3.3,2.5
 
-Models = os.listdir('./logs/')
-Models = [i for i in Models if '_' not in i]
-Models.remove('CES')
-sla_baseline = Models[0]
+# Models = [i for i in os.listdir('./logs/') if '_' not in i]
+Models = ['ACOARIMA', 'ACOLSTM', 'DecisionNN', 'SemiDirect',\
+		'GRAF', 'UAHS', 'CAHS', 'Narya', 'HASCO', 'RecSim', 'CES', 'SecoNet']
+sla_baseline = 'CES' if 'CES' in Models else Models[0]
 ModelsXticks = Models
 rot = 90
 Colors = ['red', 'blue', 'green', 'orange', 'orchid', 'pink', 'cyan'] * 2
