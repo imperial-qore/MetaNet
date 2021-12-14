@@ -11,6 +11,6 @@ class PM():
 	def powerFromCPU(self, cpu):
 		index = math.floor(cpu / 10)
 		left = self.powerlist[index]
-		right = self.powerlist[index + 1 if cpu%10 != 0 else index]
+		right = self.powerlist[index + 1 if index + 1 < len(self.powerlist) else index]
 		alpha = (cpu / 10) - index
 		return alpha * right + (1 - alpha) * left
