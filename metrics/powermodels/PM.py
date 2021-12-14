@@ -9,7 +9,7 @@ class PM():
 
 	# cpu consumption in 100
 	def powerFromCPU(self, cpu):
-		index = math.floor(cpu / 10)
+		index = max(0, math.floor(cpu / 10))
 		left = self.powerlist[index]
 		right = self.powerlist[index + 1 if index + 1 < len(self.powerlist) else index]
 		alpha = (cpu / 10) - index
