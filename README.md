@@ -41,6 +41,7 @@ http http://<public_ip>:7071/api/onnx @debug/babyyoda.jpg > output.jpg
 
 # Details and motivation
 
+As initially, the model wont predict optimal decisions, use teacher forcing to converge. Then converge again without teacher forcing.
 We call the NN as SecoNet (Serverless Co-Design Network). We call the learning process as CILP (from IJCAI paper).
 
 - We run co-simulated runs to generate gold (similar to A/B testing)
@@ -57,3 +58,12 @@ Baselines:
 - Predict+Optimization methods: ARIMA+ACO, LSTM+ACO, Decision-NN, Semi-Direct, GRAF (use for each sub-problem).
 - SOTA provisioner+decider+scheduler: UAHS+Gillis+GOSH, CAHS+Gillis+GOSH (UAHS/CAHS dont need estimates, Gillis has lower sched time), Narya+SplitPlace (Narya needs latency estimates that SplitPlace provides).
 - other co-design methods: CES, HASCO, RecSim.
+
+## Visualization
+
+1. Neural Network model
+2. SeCo/CILP model
+3. Table: r, cost, accuracy, energy, response time, sla violations, qos (baselines + Ablations + SeCo) (Ablation: w/o trans, w/o co-design)
+4. Figures: waiting time (box), cpu util/hosts active (box plots), rt per application (line), acc per application (line), decision (bars), fairness (bars), decision time (stacked bars), provisioning overhead (bars).
+5. Table (single column): Training time and test loss of each demand prediction method.
+6. Table (single column): Sensitivity Analysis of gamma (r, cost, qos); xi (acc, sla, qos); zeta (e, rt, qos). 
