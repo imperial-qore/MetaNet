@@ -65,5 +65,6 @@ Baselines:
 2. SeCo/CILP model
 3. Table: r, cost, accuracy, energy, response time, sla violations, qos (baselines + Ablations + SeCo) (Ablation: w/o trans, w/o co-design)
 4. Figures: waiting time (box), cpu util/hosts active (box plots), rt per application (line), acc per application (line), decision (bars), fairness (bars), decision time (stacked bars), provisioning overhead (bars).
-5. Table (single column): Training time and test loss of each demand prediction method.
+5. Figure (single column): Training time and test loss of each demand prediction method.
 6. Table (single column): Sensitivity Analysis of gamma (r, cost, qos); xi (acc, sla, qos); zeta (e, rt, qos). 
+7. RPi cluster image.
