@@ -1,10 +1,10 @@
 from .Provisioner import *
 from provisioner.src.utils import *
 
-class SecoNetProvisioner(Provisioner):
+class SciNetProvisioner(Provisioner):
 	def __init__(self):
 		super().__init__()
-		self.model_name = 'SecoNet'
+		self.model_name = 'SciNet'
 		self.model_loaded = False
 		self.window_buffer = []
 		self.window = None

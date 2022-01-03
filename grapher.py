@@ -56,7 +56,7 @@ plt.rcParams["figure.figsize"] = 3.3,2.5
 
 # Models = [i for i in os.listdir('./logs/') if '_' not in i]
 Models = ['ACOARIMA', 'ACOLSTM', 'DecisionNN', 'SemiDirect',\
-		'GRAF', 'UAHS', 'CAHS', 'Narya', 'HASCO', 'RecSim', 'CES', 'SecoNet']
+		'GRAF', 'UAHS', 'CAHS', 'Narya', 'HASCO', 'RecSim', 'CES', 'SciNet']
 sla_baseline = 'CES' if 'CES' in Models else Models[0]
 ModelsXticks = Models
 rot = 90
@@ -365,6 +365,22 @@ for ylabel in yLabelsStatic:
 # Bar Graphs
 x = range(5,100*5,5)
 pprint(Data)
+
+rt_pa = {}; acc_pa = {}; dec = {}
+for model in Models:
+	rt_pa[model] = {}; acc_pa[model] = {}; dec[model] = {}
+	for i, app in enumerate(apps):
+		rt_pa[model][app] = Data['Amortized Response Time (seconds) per application'][model][i]
+		acc_pa[model][app] = Data['Average Workflow Accuracy per application'][model][i]
+	for i, choice in enumerate(choices):
+		dec[model][choice] = Data['Decision Fraction per choice'][model][i]
+with open("rt_pa.json", "w") as outfile:
+    json.dump(rt_pa, outfile, indent=4)
+with open("acc_pa.json", "w") as outfile:
+    json.dump(acc_pa, outfile, indent=4)
+with open("dec.json", "w") as outfile:
+    json.dump(dec, outfile, indent=4)
+# exit()
 
 table = {"Models": Models}
 

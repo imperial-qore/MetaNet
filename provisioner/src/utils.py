@@ -144,7 +144,7 @@ def backprop(epoch, model, optimizer, scheduler, data_cpu, data_provisioner, dat
 					ps.append(model(d, p, app, dec, sched))
 				preds.append(torch.stack(ps))
 			loss = l(torch.stack(preds), data_energy[i])
-		elif 'Seco' in model.name:
+		elif 'Sci' in model.name:
 			# Window prediction
 			window = d.view(1, 1, feats)
 			elem = window[-1, :, :].view(1, 1, feats)

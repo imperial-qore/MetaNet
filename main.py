@@ -18,7 +18,7 @@ from serverless.workload.AIBenchWorkload import *
 from provisioner.Provisioner import Provisioner
 from provisioner.Random_Provisioner import RandomProvisioner
 from provisioner.CoSim_Provisioner import CoSimProvisioner
-from provisioner.SecoNet_Provisioner import SecoNetProvisioner
+from provisioner.SciNet_Provisioner import SciNetProvisioner
 from provisioner.ACOARIMA_Provisioner import ACOARIMAProvisioner
 from provisioner.ACOLSTM_Provisioner import ACOLSTMProvisioner
 from provisioner.DecisionNN_Provisioner import DecisionNNProvisioner
@@ -37,7 +37,7 @@ from decider.Layer_Only import LayerOnlyDecider
 from decider.Semantic_Only import SemanticOnlyDecider
 from decider.Compression_Only import CompressionOnlyDecider
 from decider.CoSim_Decider import CoSimDecider
-from decider.SecoNet_Decider import SecoNetDecider
+from decider.SciNet_Decider import SciNetDecider
 from decider.ACOARIMA_Decider import ACOARIMADecider
 from decider.ACOLSTM_Decider import ACOLSTMDecider
 from decider.DecisionNN_Decider import DecisionNNDecider
@@ -52,7 +52,7 @@ from decider.CES_Decider import CESDecider
 # Scheduler imports
 from scheduler.Random import RandomScheduler
 from scheduler.CoSim_Scheduler import CoSimScheduler
-from scheduler.SecoNet_Scheduler import SecoNetScheduler
+from scheduler.SciNet_Scheduler import SciNetScheduler
 from scheduler.ACOARIMA_Scheduler import ACOARIMAScheduler
 from scheduler.ACOLSTM_Scheduler import ACOLSTMScheduler
 from scheduler.DecisionNN_Scheduler import DecisionNNScheduler
@@ -80,7 +80,7 @@ parser.add_option("-t", "--type", action="store", dest="type", default="2",
 					help="Type is 0 (Create and destroy), 1 (Create), 2 (No op), 3 (Destroy)")
 parser.add_option("-m", "--model", action="store", dest="model", default="Random", 
 					choices=['Random', 'CoSim', 'ACOARIMA', 'ACOLSTM', 'DecisionNN', 'SemiDirect',\
-						'GRAF', 'UAHS', 'CAHS', 'Narya', 'HASCO', 'RecSim', 'CES', 'SecoNet'])
+						'GRAF', 'UAHS', 'CAHS', 'Narya', 'HASCO', 'RecSim', 'CES', 'SciNet'])
 opts, args = parser.parse_args()
 
 # Global constants

@@ -165,11 +165,11 @@ class RecSim(nn.Module):
 		score = self.q(torch.cat((cpu.view(-1), app.view(-1), prov.view(-1), dec.view(-1), sched.view(-1))))
 		return score
 
-## SecoNet Model
-class SecoNet(nn.Module):
+## SciNet Model
+class SciNet(nn.Module):
 	def __init__(self, feats):
-		super(SecoNet, self).__init__()
-		self.name = 'SecoNet'
+		super(SciNet, self).__init__()
+		self.name = 'SciNet'
 		self.lr = 0.002
 		self.n_feats = feats
 		self.n_window = 1
