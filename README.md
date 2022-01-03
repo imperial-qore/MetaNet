@@ -4,7 +4,7 @@ SciFramework: Serverless Co-Design Framework.
 
 "SciNet: Co-Design in Resource Management of Distributed Computing Environments"
 
-<a href="https://gitpod.io/#https://github.com/shreshthtuli/SkyNet/">
+<a href="https://gitpod.io/#https://github.com/shreshthtuli/SciNet/">
     <img src="https://gitpod.io/button/open-in-gitpod.svg" alt="Open in gitpod">
   </a>
 
