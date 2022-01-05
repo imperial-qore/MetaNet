@@ -1,5 +1,7 @@
 # SciNet
 
+Gumbel Softmax !!!
+
 SciFramework: Serverless Co-Design Framework.
 
 "SciNet: Co-Design in Resource Management of Distributed Computing Environments"
