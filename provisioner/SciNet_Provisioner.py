@@ -9,6 +9,7 @@ class SciNetProvisioner(Provisioner):
 		self.window_buffer = []
 		self.window = None
 		self.memory = None
+		self.scores = None
 		self.allpowermodels = ['PMB2s', 'PMB2ms', 'PMB4ms', 'PMB8ms']
 		costs = np.array([0.08, 0.12, 0.17, 0.33]) / 12
 		ipscaps = [2019, 2019, 4029, 16111]
@@ -66,6 +67,7 @@ class SciNetProvisioner(Provisioner):
 		memory, _ = self.model.predwindow(window_next, window_next)
 		self.memory = memory # save for decider and scheduler
 		decisions = [self.model.forward_provisioner(memory, i) for i in self.host_util]
+		self.scores = torch.stack(decisions)
 		hosts_active = 0
 		for i, decision in enumerate(decisions):
 			todo = torch.argmax(decision).item()
