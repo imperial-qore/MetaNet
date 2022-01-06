@@ -19,10 +19,12 @@ class SciNetDecider(Decider):
 	def decision(self, workflowlist):
 		if not self.model_loaded: self.load_model()
 		memory = self.env.provisioner.memory
-		results = []
+		provision_scores = self.env.provisioner.scores
+		decisions = []; results = []
 		for CreationID, interval, SLA, application in workflowlist:
 			inp = one_hot(application, self.fn_names)
-			choice = self.choices[torch.argmax(self.model.forward_decider(memory, inp)).item()]
+			decision = self.model.forward_decider(memory, inp, provision_scores)
+			choice = self.choices[torch.argmax(decision).item()]
 			tasklist = self.createTasks(CreationID, interval, SLA, application, choice)
 			results += tasklist
 		return results

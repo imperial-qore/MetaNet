@@ -20,10 +20,11 @@ class SciNetScheduler(Scheduler):
 		if not self.model_loaded: self.load_model()
 		start = time()
 		memory = self.env.provisioner.memory
+		provision_scores = self.env.provisioner.scores
 		decision = []
 		for task in tasks:
 			inp = one_hot(task.application, self.fn_names)
-			scores = self.model.forward_scheduler(memory, inp).tolist()
+			scores = self.model.forward_scheduler(memory, inp, provision_scores).tolist()
 			# scores = scores + np.random.random(len(scores)) # debug
 			# mask disabled hosts
 			for hostID, host in enumerate(self.env.hostlist):

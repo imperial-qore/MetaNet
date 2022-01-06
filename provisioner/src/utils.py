@@ -155,9 +155,9 @@ def backprop(epoch, model, optimizer, scheduler, data_cpu, data_provisioner, dat
 			p_in, p_gold = data_provisioner[i]
 			p_out = torch.stack([model.forward_provisioner(memory, i) for i in p_in])
 			d_in, d_gold = data_decider[i]
-			d_out = torch.stack([model.forward_decider(memory, i) for i in d_in])
+			d_out = torch.stack([model.forward_decider(memory, i, p_out) for i in d_in])
 			s_in, s_gold = data_scheduler[i]
-			s_out = torch.stack([model.forward_scheduler(memory, i) for i in d_in])
+			s_out = torch.stack([model.forward_scheduler(memory, i, p_out) for i in d_in])
 			p_gold, d_gold, s_gold = torch.stack(p_gold), torch.stack(d_gold), torch.stack(s_gold)
 			loss = loss + l2(p_out, p_gold) + l2(d_out, d_gold) + l2(s_out, s_gold)
 		ls.append(torch.mean(loss).item())

@@ -475,3 +475,15 @@ def multi_logistic_loss(pred, label):
 def RMSE(pred, label):
     loss = torch.mean(torch.sum((pred - label) ** 2, 1), 0) ** 0.5
     return loss
+
+def sample_gumbel(shape, eps=1e-20):
+    U = torch.rand(shape)
+    return -torch.log(-torch.log(U + eps) + eps)
+
+def gumbel_softmax_sample(logits, temperature, dim):
+    y = logits #+ sample_gumbel(logits.size())
+    return F.softmax(y / temperature, dim=dim)
+
+def gumbel_softmax(logits, dim=-1, temperature=0.01, hard=False):
+    y = gumbel_softmax_sample(logits, temperature, dim)
+    return y.view(-1)

@@ -182,8 +182,8 @@ class SciNet(nn.Module):
 		self.transformer_decoder = TransformerDecoder(decoder_layers, 1)
 		self.fcn = nn.Sigmoid()
 		self.likelihood_1 = nn.Sequential(nn.Linear(1 + feats, 2), nn.Softmax())
-		self.likelihood_2 = nn.Sequential(nn.Linear(self.n_apps + feats, self.n_choices), nn.Softmax())
-		self.likelihood_3 = nn.Sequential(nn.Linear(self.n_apps + feats, feats), nn.Softmax())
+		self.likelihood_2 = nn.Sequential(nn.Linear(self.n_apps + feats + 2*feats, self.n_choices), nn.Softmax())
+		self.likelihood_3 = nn.Sequential(nn.Linear(self.n_apps + feats + 2*feats, feats), nn.Softmax())
 
 	def predwindow(self, src, tgt):
 		src = src * math.sqrt(self.n_feats)
@@ -197,10 +197,12 @@ class SciNet(nn.Module):
 		score_1 = self.likelihood_1(torch.cat((hv.view(-1), memory.view(-1))))
 		return score_1
 
-	def forward_decider(self, memory, dv):
-		score_2 = self.likelihood_2(torch.cat((dv.view(-1), memory.view(-1))))
+	def forward_decider(self, memory, dv, p_score):
+		p_g = gumbel_softmax(p_score, dim=1)
+		score_2 = self.likelihood_2(torch.cat((dv.view(-1), memory.view(-1), p_g)))
 		return score_2
 
-	def forward_scheduler(self, memory, sv):
-		score_3 = self.likelihood_3(torch.cat((sv.view(-1), memory.view(-1))))
+	def forward_scheduler(self, memory, sv, p_score):
+		p_g = gumbel_softmax(p_score, dim=1)
+		score_3 = self.likelihood_3(torch.cat((sv.view(-1), memory.view(-1), p_g)))
 		return score_3
