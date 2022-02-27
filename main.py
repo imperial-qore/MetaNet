@@ -14,41 +14,6 @@ from serverless.Serverless import *
 from serverless.datacenter.AzureDatacenter import *
 from serverless.workload.AIBenchWorkload import *
 
-# Provisioner imports
-from provisioner.Provisioner import Provisioner
-from provisioner.Random_Provisioner import RandomProvisioner
-from provisioner.CoSim_Provisioner import CoSimProvisioner
-from provisioner.SciNet_Provisioner import SciNetProvisioner
-from provisioner.ACOARIMA_Provisioner import ACOARIMAProvisioner
-from provisioner.ACOLSTM_Provisioner import ACOLSTMProvisioner
-from provisioner.DecisionNN_Provisioner import DecisionNNProvisioner
-from provisioner.SemiDirect_Provisioner import SemiDirectProvisioner
-from provisioner.GRAF_Provisioner import GRAFProvisioner
-from provisioner.UAHS_Provisioner import UAHSProvisioner
-from provisioner.CAHS_Provisioner import CAHSProvisioner
-from provisioner.Narya_Provisioner import NaryaProvisioner
-from provisioner.HASCO_Provisioner import HASCOProvisioner
-from provisioner.RecSim_Provisioner import RecSimProvisioner
-from provisioner.CES_Provisioner import CESProvisioner
-
-# Decider imports
-from decider.Random import RandomDecider
-from decider.Layer_Only import LayerOnlyDecider
-from decider.Semantic_Only import SemanticOnlyDecider
-from decider.Compression_Only import CompressionOnlyDecider
-from decider.CoSim_Decider import CoSimDecider
-from decider.SciNet_Decider import SciNetDecider
-from decider.ACOARIMA_Decider import ACOARIMADecider
-from decider.ACOLSTM_Decider import ACOLSTMDecider
-from decider.DecisionNN_Decider import DecisionNNDecider
-from decider.SemiDirect_Decider import SemiDirectDecider
-from decider.GRAF_Decider import GRAFDecider
-from decider.Gillis_Decider import GillisDecider
-from decider.SplitPlace_Decider import SplitPlaceDecider
-from decider.HASCO_Decider import HASCODecider
-from decider.RecSim_Decider import RecSimDecider
-from decider.CES_Decider import CESDecider
-
 # Scheduler imports
 from scheduler.Random import RandomScheduler
 from scheduler.CoSim_Scheduler import CoSimScheduler
@@ -99,22 +64,14 @@ def initalizeEnvironment(environment, type, prov, dec, sched):
 	''' Can be AIBench '''
 	workload = AIBenchWorkload(NEW_TASKS, 1.5)
 
-	# Initialize provisioner
-	provisioner = eval(prov+'Provisioner()')
-
-	# Initialize decider
-	decider = eval(dec+'Decider()')
-
 	# Initialize scheduler
 	scheduler = eval(sched+'Scheduler()')
 
 	# Initialize Environment
-	env = Serverless(scheduler, decider, provisioner, INTERVAL_TIME, hostlist, environment)
+	env = Serverless(scheduler, workload, INTERVAL_TIME, hostlist, environment)
 
 	# Execute first step
-	workloadlist = workload.generateNewContainers(env.interval) # New containers info
-	provisioner.provision() # Provision hosts
-	newtasklist = decider.decision(workloadlist) # Decide splitting choice
+	newtasklist = workload.generateNewContainers(env.interval) # New containers info
 	decision, schedulingTime = scheduler.placement(newtasklist) # Decide placement using task objects
 	numdep = env.allocateInit(newtasklist, decision) # Schedule functions
 	print("New Tasks Size:", len(newtasklist))
@@ -128,12 +85,10 @@ def initalizeEnvironment(environment, type, prov, dec, sched):
 	# Initialize stats
 	stats = Stats(env, workload, datacenter, scheduler)
 	stats.saveStats(numdep, [], newtasklist, decision, schedulingTime)
-	return datacenter, workload, scheduler, decider, provisioner, env, stats
+	return datacenter, workload, scheduler, env, stats
 
-def stepSimulation(workload, scheduler, decider, provisioner, env, stats):
-	workloadlist = workload.generateNewContainers(env.interval) # New containers info
-	provisioner.provision() # Provision hosts
-	newtasklist = decider.decision(workloadlist) # Decide splitting choice
+def stepSimulation(workload, scheduler, env, stats):
+	newtasklist = workload.generateNewContainers(env.interval) # New containers info
 	decision, schedulingTime = scheduler.placement(env.waitinglist + newtasklist) # Decide placement using task objects
 	destroyed = env.destroyCompletedTasks()
 	numdep = env.simulationStep(newtasklist, decision) # Schedule containers
@@ -157,7 +112,7 @@ def saveStats(stats, dirname, end=True):
 
 if __name__ == '__main__':
 	# Initialize Environment
-	datacenter, workload, scheduler, decider, provisioner, env, stats = initalizeEnvironment(opts.env, int(opts.type), *decompose(opts.model))
+	datacenter, workload, scheduler, env, stats = initalizeEnvironment(opts.env, int(opts.type), *decompose(opts.model))
 
 	# Create log directory
 	dirname = "logs/" + opts.model
@@ -168,7 +123,7 @@ if __name__ == '__main__':
 	# Execute steps
 	for step in range(NUM_SIM_STEPS):
 		print(color.GREEN+"Execution Interval:", step, color.ENDC)
-		stepSimulation(workload, scheduler, decider, provisioner, env, stats)
+		stepSimulation(workload, scheduler, env, stats)
 		if step % 10 == 0: saveStats(stats, dirname, end = False)
 
 	# Cleanup and save results

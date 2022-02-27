@@ -1,12 +1,14 @@
 from .Workload import *
 from utils.Utils import *
 from random import gauss, choices
+from serverless.task.Task import *
 
 class AIBenchWorkload(Workload):
     def __init__(self, num_workloads, std_dev):
         super().__init__()
         self.num_workloads = num_workloads
         self.std_dev = std_dev
+        self.dataset = list(filter(lambda k: '.md' not in k, os.listdir(SAMPLE_PATH)))
         
     def generateNewContainers(self, interval):
         workloadlist = []
@@ -17,6 +19,6 @@ class AIBenchWorkload(Workload):
             CreationID = self.creation_id
             SLA = np.random.randint(5,8) ## Update this based on intervals taken
             application = choices(applications, weights=weights)[0]
-            workloadlist.append((CreationID, interval, SLA, application))
+            workloadlist.append(Task(CreationID, interval, SLA, application, 'compression', self.env, 0, [], self.dataset))
             self.creation_id += 1
         return workloadlist

@@ -14,14 +14,12 @@ class Serverless():
 	# Total power in watt
 	# Total Router Bw
 	# Interval Time in seconds
-	def __init__(self, Scheduler, Decider, Provisioner, IntervalTime, hostinit, env):
+	def __init__(self, Scheduler, Workload, IntervalTime, hostinit, env):
 		self.hostlimit = len(hostinit)
 		self.scheduler = Scheduler
 		self.scheduler.setEnvironment(self)
-		self.decider = Decider
-		self.decider.setEnvironment(self)
-		self.provisioner = Provisioner
-		self.provisioner.setEnvironment(self)
+		self.workload = Workload
+		self.workload.setEnvironment(self)
 		self.hostlist = []
 		self.completedtasklist = []
 		self.activetasklist = []

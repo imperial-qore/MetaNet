@@ -1,1 +1,0 @@
-These datasets have been obtained by running CoSimProvisioner, CoSimDecider and CoSimScheduler for 1000 intervals.
