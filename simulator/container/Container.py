@@ -4,7 +4,7 @@ class Container():
 	# RAM = ram requirement in MB
 	# Size = container size in MB
 	def __init__(self, ID, creationID, creationInterval, IPSModel, RAMModel, DiskModel, Environment, HostID = -1):
-		self.id = ID
+		self.taskID = ID
 		self.creationID = creationID
 		self.ipsmodel = IPSModel
 		self.ipsmodel.allocContainer(self)
@@ -29,7 +29,7 @@ class Container():
 	def getApparentIPS(self):
 		hostBaseIPS = self.getHost().getBaseIPS()
 		hostIPSCap = self.getHost().ipsCap
-		canUseIPS = (hostIPSCap - hostBaseIPS) / len(self.env.getContainersOfHost(self.hostid))
+		canUseIPS = (hostIPSCap - hostBaseIPS) / max(1, len(self.env.getContainersOfHost(self.hostid)))
 		return min(self.ipsmodel.getMaxIPS(), self.getBaseIPS() + canUseIPS)
 
 	def getRAM(self):

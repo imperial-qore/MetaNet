@@ -41,9 +41,9 @@ from pdb import set_trace as bp
 usage = "usage: python main.py -e <environment> -t <type> -m <model>"
 
 parser = optparse.OptionParser(usage=usage)
-parser.add_option("-e", "--environment", action="store", dest="env", default="Azure", 
-					choices=['Azure', 'VLAN'],
-					help="Environment is Azure or VLAN.")
+parser.add_option("-e", "--environment", action="store", dest="env", default="Sim", 
+					choices=['Azure', 'Sim'],
+					help="Environment is Azure or Sim.")
 parser.add_option("-t", "--type", action="store", dest="type", default="2", 
 					choices=['0', '1', '2', '3'],
 					help="Type is 0 (Create and destroy), 1 (Create), 2 (No op), 3 (Destroy)")
@@ -60,7 +60,7 @@ NEW_TASKS = 0
 
 ROUTER_BW = 10000
 
-def initalizeEnvironment(environment, type, prov, dec, sched):
+def initalizeEnvironment(environment, type, sched):
 	# Initialize simple fog datacenter
 	''' Can be AzureDatacenter / AzureFog '''
 	if environment == 'Azure':
@@ -84,7 +84,7 @@ def initalizeEnvironment(environment, type, prov, dec, sched):
 	if environment == 'Azure':
 		env = Serverless(scheduler, workload, INTERVAL_TIME, hostlist, environment)
 	else:
-		env = Simulator(ROUTER_BW, scheduler, HOSTS, INTERVAL_TIME, hostlist)
+		env = Simulator(ROUTER_BW, scheduler, workload, HOSTS, INTERVAL_TIME, hostlist)
 
 	# Execute first step
 	newtasklist = workload.generateNewContainers(env.interval) # New containers info
@@ -94,8 +94,6 @@ def initalizeEnvironment(environment, type, prov, dec, sched):
 	print("Waiting List Size:", len(env.waitinglist))
 	print("Tasks in hosts:", env.getTasksInHosts())
 	print("Deployed:", numdep, "of", len(env.waitinglist + newtasklist))
-	printProvisioned(env.hostlist)
-	printDecisions(newtasklist)
 	print("Schedule:", decision)
 
 	# Initialize stats
@@ -113,8 +111,6 @@ def stepSimulation(workload, scheduler, env, stats):
 	print("Tasks in hosts:", env.getTasksInHosts())
 	print("Deployed:", numdep, "of", len(env.waitinglist + newtasklist))
 	print("Destroyed:", len(destroyed), "of", len(env.activetasklist))
-	printProvisioned(env.hostlist)
-	printDecisions(newtasklist)
 	print("Schedule:", decision)
 
 	stats.saveStats(numdep, destroyed, newtasklist, decision, schedulingTime)
@@ -128,7 +124,7 @@ def saveStats(stats, dirname, end=True):
 
 if __name__ == '__main__':
 	# Initialize Environment
-	datacenter, workload, scheduler, env, stats = initalizeEnvironment(opts.env, int(opts.type), *decompose(opts.model))
+	datacenter, workload, scheduler, env, stats = initalizeEnvironment(opts.env, int(opts.type), opts.model)
 
 	# Create log directory
 	dirname = "logs/" + opts.model
@@ -143,6 +139,7 @@ if __name__ == '__main__':
 		if step % 10 == 0: saveStats(stats, dirname, end = False)
 
 	# Cleanup and save results
-	datacenter.cleanup()
+	if env.__class__.__name__ == 'Serverless':
+		datacenter.cleanup()
 	saveStats(stats, dirname)
 

@@ -18,6 +18,7 @@ class Host():
 		self.powermodel.allocHost(self)
 		self.powermodel.host = self
 		self.env = Environment
+		self.enable = True
 
 	def getPower(self):
 		return self.powermodel.power()
@@ -27,7 +28,7 @@ class Host():
 		
 	def getCPU(self):
 		ips = self.getApparentIPS()
-		return 100 * (ips / self.ipsCap)
+		return max(0, min(100, 100 * (ips / self.ipsCap)))
 
 	def getBaseIPS(self):
 		# Get base ips count as sum of min ips of all containers

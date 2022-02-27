@@ -5,6 +5,7 @@ class Workload():
 		self.creation_id = 0
 		self.createdContainers = []
 		self.deployedContainers = []
+		self.env = None
 
 	def getUndeployedContainers(self):
 		undeployed = []
@@ -17,3 +18,6 @@ class Workload():
 		for cid in creationIDs:
 			assert not self.deployedContainers[cid]
 			self.deployedContainers[cid] = True
+
+	def setEnvironment(self, env):
+		self.env = env

@@ -19,6 +19,6 @@ class AIBenchWorkload(Workload):
             CreationID = self.creation_id
             SLA = np.random.randint(5,8) ## Update this based on intervals taken
             application = choices(applications, weights=weights)[0]
-            workloadlist.append(Task(CreationID, interval, SLA, application, 'compression', self.env, 0, [], self.dataset))
+            workloadlist.append(Task(CreationID, interval, SLA, application, 'compression', self.env, 0, [], [SAMPLE_PATH + i for i in self.dataset]))
             self.creation_id += 1
         return workloadlist

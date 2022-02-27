@@ -2,6 +2,7 @@ from .Workload import *
 from simulator.container.IPSModels.IPSMBitbrain import *
 from simulator.container.RAMModels.RMBitbrain import *
 from simulator.container.DiskModels.DMBitbrain import *
+from simulator.container.Container import *
 from random import gauss, randint
 from os import path, makedirs, listdir, remove
 import wget
@@ -52,8 +53,6 @@ class BWGD2(Workload):
 			RAMModel = RMBitbrain((df['Memory usage [KB]']/4000).to_list(), (df['Network received throughput [KB/s]']/1000).to_list(), (df['Network transmitted throughput [KB/s]']/1000).to_list())
 			disk_size  = self.disk_sizes[index % len(self.disk_sizes)]
 			DiskModel = DMBitbrain(disk_size, (df['Disk read throughput [KB/s]']/4000).to_list(), (df['Disk write throughput [KB/s]']/12000).to_list())
-			workloadlist.append((CreationID, interval, IPSModel, RAMModel, DiskModel))
+			workloadlist.append(Container(0, CreationID, interval, IPSModel, RAMModel, DiskModel, self.env))
 			self.creation_id += 1
-		self.createdContainers += workloadlist
-		self.deployedContainers += [False] * len(workloadlist)
-		return self.getUndeployedContainers()
+		return workloadlist

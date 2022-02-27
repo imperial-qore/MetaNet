@@ -20,7 +20,6 @@ class Stats():
 		self.alltaskinfo = []
 		self.metrics = []
 		self.schedulerinfo = []
-		self.deciderinfo = []
 
 	def saveHostInfo(self):
 		hostinfo = dict()
@@ -62,9 +61,9 @@ class Stats():
 			taskinfo['destroyAt'] = task.destroyAt
 			taskinfo['creationID'] = task.creationID
 			taskinfo['taskID'] = task.taskID
-			taskinfo['application'] = task.application
+			if self.env.__class__.__name__ == 'Severless':
+				taskinfo['application'] = task.application
 			taskinfo['hostid'] = task.hostid
-			taskinfo['choice'] = task.choice
 			taskinfo['sla'] = task.sla
 			self.alltaskinfo.append(taskinfo)
 
@@ -93,20 +92,12 @@ class Stats():
 		schedulerinfo['schedulingtime'] = schedulingtime
 		self.schedulerinfo.append(schedulerinfo)
 
-	def saveDeciderInfo(self, newtasklist):
-		deciderinfo = dict()
-		deciderinfo['interval'] = self.env.interval
-		deciderinfo['applications'] = [task.application for task in newtasklist]
-		deciderinfo['choices'] = [task.choice for task in newtasklist]
-		self.deciderinfo.append(deciderinfo)
-
 	def saveStats(self, numdep, destroyed, newtasklist, decision, schedulingtime):	
 		self.saveHostInfo()
 		self.saveWorkloadInfo(numdep)
 		self.saveAllTaskInfo()
 		self.saveMetrics(destroyed)
 		self.saveSchedulerInfo(decision[-len(newtasklist):] if newtasklist else [], schedulingtime)
-		self.saveDeciderInfo(newtasklist)
 
 	########################################################################################################
 
@@ -202,24 +193,6 @@ class Stats():
 		df = pd.DataFrame(metric_with_interval)
 		df.to_csv(dirname + '/' + title + '.csv' , header=False, index=False)
 
-	def generateSimpleDeciderDatasetWithInterval(self, dirname):
-		title = 'decider' + '_' + 'with_interval' 
-		totalIntervals = len(self.deciderinfo)
-		metric_with_interval = []
-		for interval in range(totalIntervals-1):
-			metric_with_interval.append(self.deciderinfo[interval]['applications'] + self.deciderinfo[interval]['choices'])
-		df = pd.DataFrame(metric_with_interval)
-		df.to_csv(dirname + '/' + title + '.csv' , header=False, index=False)
-	
-	def generateSimpleSchedulerDatasetWithInterval(self, dirname):
-		title = 'scheduler' + '_' + 'with_interval' 
-		totalIntervals = len(self.deciderinfo)
-		metric_with_interval = []
-		for interval in range(totalIntervals-1):
-			metric_with_interval.append(self.deciderinfo[interval]['applications'] + self.schedulerinfo[interval]['decision'])
-		df = pd.DataFrame(metric_with_interval)
-		df.to_csv(dirname + '/' + title + '.csv' , header=False, index=False)
-
 	def generateGraphs(self, dirname):
 		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'cpu')
 		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'numcontainers')
@@ -234,8 +207,6 @@ class Stats():
 		self.generateSimpleHostDatasetWithInterval(dirname, 'cpu')
 		self.generateSimpleHostDatasetWithInterval(dirname, 'enable')
 		self.generateSimpleMetricsDatasetWithInterval(dirname, 'energy')
-		self.generateSimpleDeciderDatasetWithInterval(dirname)
-		self.generateSimpleSchedulerDatasetWithInterval(dirname)
 		
 	def generateCompleteDatasets(self, dirname):
 		self.generateCompleteDataset(dirname, self.hostinfo, 'hostinfo')
@@ -243,5 +214,4 @@ class Stats():
 		self.generateCompleteDataset(dirname, self.metrics, 'metrics')
 		self.generateCompleteDataset(dirname, self.alltaskinfo, 'alltaskinfo')
 		self.generateCompleteDataset(dirname, self.schedulerinfo, 'schedulerinfo')
-		self.generateCompleteDataset(dirname, self.deciderinfo, 'deciderinfo')
 	
