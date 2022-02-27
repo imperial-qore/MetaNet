@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from provisioner.src.dlutils import *
+from .dlutils import *
 torch.manual_seed(1)
 
 ## Simple FCN Network

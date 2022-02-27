@@ -5,5 +5,5 @@ class Workload():
 		self.creation_id = 0
 		self.env = None
 
-    def setEnvironment(self, env):
-        self.env = env
+	def setEnvironment(self, env):
+		self.env = env

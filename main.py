@@ -17,7 +17,6 @@ from serverless.workload.AIBenchWorkload import *
 # Scheduler imports
 from scheduler.Random import RandomScheduler
 from scheduler.CoSim_Scheduler import CoSimScheduler
-from scheduler.SciNet_Scheduler import SciNetScheduler
 from scheduler.ACOARIMA_Scheduler import ACOARIMAScheduler
 from scheduler.ACOLSTM_Scheduler import ACOLSTMScheduler
 from scheduler.DecisionNN_Scheduler import DecisionNNScheduler
@@ -25,9 +24,6 @@ from scheduler.SemiDirect_Scheduler import SemiDirectScheduler
 from scheduler.GRAF_Scheduler import GRAFScheduler
 from scheduler.GOBI_Scheduler import GOBIScheduler
 from scheduler.GOSH_Scheduler import GOSHScheduler
-from scheduler.HASCO_Scheduler import HASCOScheduler
-from scheduler.RecSim_Scheduler import RecSimScheduler
-from scheduler.CES_Scheduler import CESScheduler
 
 # Auxiliary imports
 from stats.Stats import *

@@ -1,5 +1,4 @@
 from .Scheduler import *
-from decider.src.utils import *
 from .src.gosh import *
 
 class GOSHScheduler(Scheduler):

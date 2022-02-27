@@ -1,6 +1,6 @@
 import os
 from utils.Utils import *
-from provisioner.src.utils import load_cpu_dataset, load_scheduler_dataset, load_energy_dataset, plot_accuracies, one_hot
+from .provisioner_utils import load_cpu_dataset, load_scheduler_dataset, load_energy_dataset, plot_accuracies, one_hot
 from .models import *
 from copy import deepcopy
 import numpy as np

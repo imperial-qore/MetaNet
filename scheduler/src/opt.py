@@ -1,7 +1,7 @@
 import numpy as np
 from copy import deepcopy
 import random
-from decider.src.utils import *
+from .utils import *
 
 class Opt:
 	def __init__(self, ipsdata, env, tasklist):
