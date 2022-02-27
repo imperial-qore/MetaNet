@@ -14,6 +14,14 @@ from serverless.Serverless import *
 from serverless.datacenter.AzureDatacenter import *
 from serverless.workload.AIBenchWorkload import *
 
+# Simulator imports
+from simulator.Simulator import *
+from simulator.environment.AzureFog import *
+from simulator.environment.BitbrainFog import *
+from simulator.workload.BitbrainWorkload2 import *
+from simulator.workload.Azure2017Workload import *
+from simulator.workload.Azure2019Workload import *
+
 # Scheduler imports
 from scheduler.Random import RandomScheduler
 from scheduler.CoSim_Scheduler import CoSimScheduler
@@ -41,7 +49,7 @@ parser.add_option("-t", "--type", action="store", dest="type", default="2",
 					help="Type is 0 (Create and destroy), 1 (Create), 2 (No op), 3 (Destroy)")
 parser.add_option("-m", "--model", action="store", dest="model", default="Random", 
 					choices=['Random', 'CoSim', 'ACOARIMA', 'ACOLSTM', 'DecisionNN', 'SemiDirect',\
-						'GRAF', 'UAHS', 'CAHS', 'Narya', 'HASCO', 'RecSim', 'CES', 'SciNet'])
+						'GRAF', 'CES', 'GRAF'])
 opts, args = parser.parse_args()
 
 # Global constants
@@ -50,21 +58,33 @@ HOSTS = 10
 INTERVAL_TIME = 5 # seconds
 NEW_TASKS = 0
 
+ROUTER_BW = 10000
+
 def initalizeEnvironment(environment, type, prov, dec, sched):
 	# Initialize simple fog datacenter
-	''' Can be AzureDatacenter '''
-	datacenter = eval(environment+'Datacenter(type)')
+	''' Can be AzureDatacenter / AzureFog '''
+	if environment == 'Azure':
+		datacenter = AzureDatacenter(type)
+	else:
+		datacenter = AzureFog(HOSTS)
 	hostlist = datacenter.generateHosts()
 	
 	# Initialize workload
-	''' Can be AIBench '''
-	workload = AIBenchWorkload(NEW_TASKS, 1.5)
+	''' Can be AIBench / BWGD2 '''
+	if environment == 'Azure':
+		workload = AIBenchWorkload(NEW_TASKS, 1.5)
+	else: 
+		workload = BWGD2(NEW_TASKS, 1.5)
 
 	# Initialize scheduler
 	scheduler = eval(sched+'Scheduler()')
 
 	# Initialize Environment
 	env = Serverless(scheduler, workload, INTERVAL_TIME, hostlist, environment)
+	if environment == 'Azure':
+		env = Serverless(scheduler, workload, INTERVAL_TIME, hostlist, environment)
+	else:
+		env = Simulator(ROUTER_BW, scheduler, HOSTS, INTERVAL_TIME, hostlist)
 
 	# Execute first step
 	newtasklist = workload.generateNewContainers(env.interval) # New containers info

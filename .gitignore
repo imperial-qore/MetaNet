@@ -5,6 +5,7 @@ __pycache__/
 temp/
 logs/
 results/
+simulator/workload/datasets
 
 # C extensions
 *.so
