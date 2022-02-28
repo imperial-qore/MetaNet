@@ -20,6 +20,7 @@ class Stats():
 		self.alltaskinfo = []
 		self.metrics = []
 		self.schedulerinfo = []
+		self.simulator_params = []
 
 	def saveHostInfo(self):
 		hostinfo = dict()
@@ -98,6 +99,8 @@ class Stats():
 		self.saveAllTaskInfo()
 		self.saveMetrics(destroyed)
 		self.saveSchedulerInfo(decision[-len(newtasklist):] if newtasklist else [], schedulingtime)
+		if self.env.__class__.__name__ == 'Simulator':
+			self.simulator_params.append(self.env.generateParams())
 
 	########################################################################################################
 
@@ -174,6 +177,15 @@ class Stats():
 			metric_with_interval.append([datum[value] for value in datum.keys()])
 		df = pd.DataFrame(metric_with_interval, columns=headers)
 		df.to_csv(dirname + '/' + title + '.csv', index=False)
+
+	def generateSimulatorParamsWithInterval(self, dirname):
+		title =  'params_with_interval' 
+		totalIntervals = len(self.hostinfo)
+		params_with_intervals = []
+		for interval in range(totalIntervals-1):
+			params_with_intervals.append(np.array(self.simulator_params[interval]).reshape(-1))
+		df = pd.DataFrame(params_with_intervals)
+		df.to_csv(dirname + '/' + title + '.csv' , header=False, index=False)
 
 	def generateSimpleMetricsDatasetWithInterval(self, dirname, metric):
 		title = metric + '_' + 'with_interval' 

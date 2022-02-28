@@ -18,6 +18,7 @@ class Host():
 		self.powermodel.allocHost(self)
 		self.powermodel.host = self
 		self.env = Environment
+		self.migrationoverhead = 0
 		self.enable = True
 
 	def getPower(self):

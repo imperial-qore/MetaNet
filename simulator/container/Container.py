@@ -60,7 +60,7 @@ class Container():
 			lastMigrationTime += self.getContainerSize() / allocBw
 			lastMigrationTime += abs(self.env.hostlist[self.hostid].latency - self.env.hostlist[hostID].latency)
 		self.hostid = hostID
-		return lastMigrationTime
+		return lastMigrationTime + self.env.hostlist[self.hostid].migrationoverhead
 
 	def execute(self, lastMigrationTime):
 		# Migration time is the time to migrate to new host

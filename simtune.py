@@ -1,35 +1,41 @@
 from main import *
+import random
 
-def runModel(model):
-	global opts
-	opts.model = model
+def perturb_params(params):
+	for i in range(len(params)):
+		for j in range(len(params[i])):
+			params[i][j] = max(0, params[i][j] * (1 + (random.random() - 0.5) / 10))
+	return params	
 
-	# Create log directory
-	dirname = "logs/" + opts.model
-	if os.path.exists(dirname): shutil.rmtree(dirname, ignore_errors=True)
-	os.mkdir(dirname)
-
+def runModel(model, steps = NUM_SIM_STEPS, dirname = 'real'):
+	global opts; opts.model = model
 	# Initialize Environment
 	datacenter, workload, scheduler, env, stats = initalizeEnvironment(opts.env, int(opts.type), opts.model)
 
 	# Execute steps
-	for step in range(NUM_SIM_STEPS):
+	for step in range(steps):
 		print(color.GREEN+"Execution Interval:", step, color.ENDC)
 		stepSimulation(workload, scheduler, env, stats)
-		if step % 10 == 0: saveStats(stats, dirname, end = False)
+		if 'surrogate' in dirname and step % 10 == 0:
+			params = env.generateParams()
+			params = perturb_params(params)
+			env.updateParams(params)
 
 	# Cleanup and save results
-	if env.__class__.__name__ == 'Serverless':
-		datacenter.cleanup()
-	saveStats(stats, dirname)
+	if env.__class__.__name__ == 'Serverless': datacenter.cleanup()
 	return stats
 
-def generateRealTrace():
+def generateRandomTrace(env, dirname):
 	# return saved stats if this is a prerun host set
-	stats = runModel('Random')
-	stats.generateSimpleHostDatasetWithInterval('data', 'cpu')
-	stats.generateSimpleMetricsDatasetWithInterval('data', 'avgresponsetime')
-	stats.generateSimpleMetricsDatasetWithInterval('data', 'energytotalinterval')
+	global opts
+	opts.env = env
+	os.makedirs(f"data/{dirname}", exist_ok=True)
+	stats = runModel('Random', NUM_SIM_STEPS if env == 'Azure' else NUM_SIM_STEPS * 2, dirname)
+	stats.generateSimpleHostDatasetWithInterval(f'data/{dirname}/', 'cpu')
+	stats.generateSimpleMetricsDatasetWithInterval(f'data/{dirname}/', 'avgresponsetime')
+	stats.generateSimpleMetricsDatasetWithInterval(f'data/{dirname}/', 'energytotalinterval')
+	if 'surrogate' in dirname:
+		stats.generateSimulatorParamsWithInterval(f'data/{dirname}/')
 	return stats
 
 if __name__ == '__main__':
@@ -38,9 +44,11 @@ if __name__ == '__main__':
 	opts.type, opts.env = 2, 'Azure'
 
 	# Generate trace from Random scheduler
-	realTrace = generateRealTrace()
+	# realTrace = generateRandomTrace('Azure', 'real')
 
-	# Train a surrogate model
+	# Train a surrogate model with generated trace
+	simTrace = generateRandomTrace('Sim', 'sim_surrogate')
+	# surrogate = trainModel()
 	
 	# Update simulator parameters
 
