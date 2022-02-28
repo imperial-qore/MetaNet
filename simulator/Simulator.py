@@ -74,7 +74,7 @@ class Simulator():
 				disksizereq <= disksizeav)
 
 	def allocateInit(self, containers, decision):
-		migrations = []; deployed = 0
+		migrations = []; deployed = 0; self.interval += 1
 		routerBwToEach = self.totalbw / len(decision)
 		for i, hid in enumerate(decision):
 			container = containers[i]
@@ -130,7 +130,7 @@ class Simulator():
 
 	def simulationStep(self, containers, decision):
 		routerBwToEach = self.totalbw / len(decision) if len(decision) > 0 else self.totalbw
-		migrations = []; deployed = 0
+		migrations = []; deployed = 0; self.interval += 1
 		containerIDsAllocated = []
 		for i, hid in enumerate(decision):
 			container = containers[i]

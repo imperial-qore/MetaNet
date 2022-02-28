@@ -1,4 +1,5 @@
 from main import *
+from surrogate.surrogate import *
 import random
 
 def perturb_params(params):
@@ -7,10 +8,12 @@ def perturb_params(params):
 			params[i][j] = max(0, params[i][j] * (1 + (random.random() - 0.5) / 10))
 	return params	
 
-def runModel(model, steps = NUM_SIM_STEPS, dirname = 'real'):
+def runModel(model, steps = NUM_SIM_STEPS, dirname = 'real', params = None):
 	global opts; opts.model = model
 	# Initialize Environment
 	datacenter, workload, scheduler, env, stats = initalizeEnvironment(opts.env, int(opts.type), opts.model)
+	if dirname == 'sim':
+		env.updateParams(params)
 
 	# Execute steps
 	for step in range(steps):
@@ -25,12 +28,12 @@ def runModel(model, steps = NUM_SIM_STEPS, dirname = 'real'):
 	if env.__class__.__name__ == 'Serverless': datacenter.cleanup()
 	return stats
 
-def generateRandomTrace(env, dirname):
+def generateRandomTrace(env, dirname, params = None):
 	# return saved stats if this is a prerun host set
 	global opts
 	opts.env = env
 	os.makedirs(f"data/{dirname}", exist_ok=True)
-	stats = runModel('Random', NUM_SIM_STEPS if env == 'Azure' else NUM_SIM_STEPS * 2, dirname)
+	stats = runModel('Random', NUM_SIM_STEPS if env == 'Azure' else NUM_SIM_STEPS * 2, dirname, params)
 	stats.generateSimpleHostDatasetWithInterval(f'data/{dirname}/', 'cpu')
 	stats.generateSimpleMetricsDatasetWithInterval(f'data/{dirname}/', 'avgresponsetime')
 	stats.generateSimpleMetricsDatasetWithInterval(f'data/{dirname}/', 'energytotalinterval')
@@ -47,16 +50,18 @@ if __name__ == '__main__':
 	# realTrace = generateRandomTrace('Azure', 'real')
 
 	# Train a surrogate model with generated trace
-	simTrace = generateRandomTrace('Sim', 'sim_surrogate')
-	# surrogate = trainModel()
+	# simSurTrace = generateRandomTrace('Sim', 'sim_surrogate')
+	surrogate = trainModel(HOSTS, FEATS)
 	
 	# Update simulator parameters
+	tunedParams = opt(surrogate, HOSTS)
 
 	# Generate more data trace using simulator
+	simTrace = generateRandomTrace('Sim', 'sim', tunedParams)
 
 	# Train scheduler using more vertical data
 
-	# Run trained scheduler using scheduler's horizontal data
+	# Run trained scheduler using tuned scheduler
 
 
 

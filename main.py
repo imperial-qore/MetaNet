@@ -54,7 +54,7 @@ opts, args = parser.parse_args()
 
 # Global constants
 NUM_SIM_STEPS = 200
-HOSTS = 10
+HOSTS = 16
 INTERVAL_TIME = 5 # seconds
 NEW_TASKS = 0
 
