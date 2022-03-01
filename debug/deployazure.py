@@ -35,14 +35,14 @@ run('az login')
 # ##################
 
 print(f'{HEADER}Create Azure resource group{ENDC}')
-run(f'az group create --location uksouth --name SimTune')
+run(f'az group create --location uksouth --name MetaNet')
 
 # ##################
 
 print(f'{HEADER}Create Azure VM{ENDC}')
 for i, size in enumerate(vmlist):
   name = f'vm{i+1}'
-  dat = run(f'az vm create --resource-group SimTune --name {name} --size {size} --image UbuntuLTS --ssh-key-values keys/id_rsa.pub --admin-username ansible')
+  dat = run(f'az vm create --resource-group MetaNet --name {name} --size {size} --image UbuntuLTS --ssh-key-values keys/id_rsa.pub --admin-username ansible')
 
 # ##################
 
@@ -54,14 +54,14 @@ sleep(60)
 print(f'{HEADER}Open port 7071 for all VMs{ENDC}')
 for i, size in enumerate(vmlist):
   name = f'vm{i+1}'
-  run(f'az vm open-port --resource-group SimTune --name {name} --port 7071')
+  run(f'az vm open-port --resource-group MetaNet --name {name} --port 7071')
 
 #################
 
 print(f'{HEADER}Install Dependencies and Deploy Functions{ENDC}')
 for i, size in enumerate(vmlist):
   name = f'vm{i+1}'
-  ip = run(f"az vm show -d -g SimTune -n {name} --query publicIps -o tsv").strip()
+  ip = run(f"az vm show -d -g MetaNet -n {name} --query publicIps -o tsv").strip()
   info = {'ip': ip, 'cpu': getdigit(size), 'powermodel': 'PM'+size.split('_')[1]}
   servers.append(info)
   run(f'rsync -Pav -e "ssh -i ./keys/id_rsa" ./functions/ ansible@{ip}:/home/ansible/functions/')
