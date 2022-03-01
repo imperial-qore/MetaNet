@@ -30,26 +30,38 @@ if __name__ == '__main__':
 	if not os.path.exists("logs"): os.mkdir("logs")
 	if os.path.exists(dirname): shutil.rmtree(dirname, ignore_errors=True)
 	os.mkdir(dirname)
-	opts.type, opts.env = 2, 'Azure'
+	opts.type, opts.env, opts.model = 2, 'Azure', 'GOBI'
+	NUM_TASKS = 1000; WORKER_COST_PS = 0.008; BROKER_COST_PS = 0.000016
 
 	# Generate trace from schedulers
 	schedulers = ['GOSH', 'GOBI', 'GA', 'GRAF', 'DecisionNN', 'ACOLSTM']
 	for sched in schedulers:
 		if os.path.exists('data/'+sched): continue
-		generateTrace(sched, 10)
+		generateTrace(sched, 5)
 
 	# Train MetaNet
-	model = trainModel(HOSTS, schedulers)
-	exit()
+	model, range_rt, range_st = trainModel(HOSTS, schedulers)
 
-
-	# Run trained scheduler using tuned scheduler
-	opts.env, opts.model = 'Azure', 'GOBI'
+	# Run experiment using MetaNet
 	datacenter, workload, scheduler, env, stats = initalizeEnvironment(opts.env, int(opts.type), opts.model)
-	scheduler.model = tunedModel
+	scheduler_objs = []
+	for sched in schedulers:
+		s_obj = eval(sched+'Scheduler()')
+		s_obj.setEnvironment(env)
+		scheduler_objs.append(s_obj)
 
 	for step in range(NUM_SIM_STEPS):
 		print(color.GREEN+"Execution Interval:", step, color.ENDC)
+		# Select scheduler
+		cpu = torch.tensor([h.getCPU() for h in env.hostlist], dtype=torch.float64) / 100
+		predr, preds = model(cpu)
+		predr, preds = predr.detach().numpy(), preds.detach().numpy()
+		predr, preds = predr  * WORKER_COST_PS, preds * BROKER_COST_PS * NUM_SIM_STEPS * INTERVAL_TIME
+		final_costs = predr + preds
+		optimum_scheduler_index = np.argmin(final_costs)
+		scheduler = scheduler_objs[optimum_scheduler_index]
+
+		# Run simulation step
 		stepSimulation(workload, scheduler, env, stats)
 
 	datacenter.cleanup()

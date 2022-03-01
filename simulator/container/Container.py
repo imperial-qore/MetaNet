@@ -21,6 +21,8 @@ class Container():
 		self.totalMigrationTime = 0
 		self.active = True
 		self.destroyAt = -1
+		self.application = 'blur'
+		self.choice = 'compression'
 		self.lastContainerSize = 0
 
 	def getBaseIPS(self):
