@@ -9,6 +9,8 @@ from csv import reader
 from utils.Utils import *
 from .models import *
 
+base_url = 'scheduler/src/'
+
 def one_hot(value, lst):
 	vec = torch.zeros(len(lst))
 	vec[lst.index(value)] = 1

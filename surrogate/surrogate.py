@@ -92,3 +92,28 @@ def opt(model, N_HOSTS):
         iteration += 1; z_old = z.item()
     init.requires_grad = False 
     return init.view(N_HOSTS, -1).tolist()
+
+def load_cpu_dataset(feats):
+	fname = f'data/sim/cpu_with_interval.csv'
+	dset = np.abs(np.genfromtxt(fname, delimiter=',')).reshape(-1, feats) / 100
+	dset  = torch.FloatTensor(dset)
+	split = int(0.9 * dset.shape[0])
+	train, test = dset[:split], dset[split:]
+	return train, test
+
+def train_scheduler(HOSTS):
+    # Load model
+    model, optimizer, scheduler, epoch, loss_list = load_model('GOBI', HOSTS)
+    # Load dataset
+    train_cpu, test_cpu = load_cpu_dataset(HOSTS)
+    train_scheduler, test_scheduler = load_scheduler_dataset(HOSTS)
+    train_energy, test_energy, emax = load_energy_dataset(HOSTS)
+    # Train model 
+    for e in tqdm(list(range(epoch+1, epoch+num_epochs+1))):
+        lossT, lr = backprop(e, model, optimizer, scheduler, train_cpu, train_scheduler, train_energy)
+        lossTest, _ = backprop(e, model, optimizer, scheduler, test_cpu, test_scheduler, train_energy, False)
+        loss_list.append((lossT, lossTest, lr))
+        tqdm.write(f'Epoch {e},\tTrain Loss = {lossT},\tTest loss = {lossTest}')
+    # Freeze encoder
+    freeze(model)
+    return model

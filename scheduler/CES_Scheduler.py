@@ -1,5 +1,5 @@
 from .Scheduler import *
-from provisioner.src.utils import *
+from .src.provisioner_utils import *
 from .src.opt import *
 
 class CESScheduler(Scheduler):

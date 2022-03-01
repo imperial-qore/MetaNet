@@ -1,4 +1,5 @@
 from .Scheduler import *
+from .src.provisioner_utils import *
 from .src.opt import *
 
 class SemiDirectScheduler(Scheduler):
