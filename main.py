@@ -30,6 +30,7 @@ from scheduler.ACOLSTM_Scheduler import ACOLSTMScheduler
 from scheduler.DecisionNN_Scheduler import DecisionNNScheduler
 from scheduler.SemiDirect_Scheduler import SemiDirectScheduler
 from scheduler.GRAF_Scheduler import GRAFScheduler
+from scheduler.GA_Scheduler import GAScheduler
 from scheduler.GOBI_Scheduler import GOBIScheduler
 from scheduler.GOSH_Scheduler import GOSHScheduler
 

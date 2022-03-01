@@ -10,6 +10,7 @@ from utils.Utils import *
 from .models import *
 
 base_url = 'scheduler/src/'
+num_epochs = 5
 
 def one_hot(value, lst):
 	vec = torch.zeros(len(lst))
@@ -91,8 +92,8 @@ def save_model(model, optimizer, scheduler, epoch, loss_list):
 		'loss_list': loss_list}, file_path)
 
 def load_model(modelname, dims):
-	import provisioner.src.models
-	model_class = getattr(provisioner.src.models, modelname)
+	import scheduler.src.models
+	model_class = getattr(scheduler.src.models, modelname)
 	model = model_class(dims)
 	optimizer = torch.optim.Adam(model.parameters() , lr=model.lr, weight_decay=1e-5)
 	scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 5, 0.9)

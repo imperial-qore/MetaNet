@@ -187,6 +187,15 @@ class Stats():
 		df = pd.DataFrame(params_with_intervals)
 		df.to_csv(dirname + '/' + title + '.csv' , header=False, index=False)
 
+	def generateSchedulerTimeDatasetWithInterval(self, dirname):
+		title = 'schedtime_with_interval' 
+		totalIntervals = len(self.hostinfo)
+		metric_with_interval = []
+		for interval in range(totalIntervals-1):
+			metric_with_interval.append(np.mean(self.schedulerinfo[interval]['schedulingtime']))
+		df = pd.DataFrame(metric_with_interval)
+		df.to_csv(dirname + '/' + title + '.csv' , header=False, index=False)
+
 	def generateSimpleMetricsDatasetWithInterval(self, dirname, metric):
 		title = metric + '_' + 'with_interval' 
 		totalIntervals = len(self.hostinfo)

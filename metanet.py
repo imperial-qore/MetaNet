@@ -1,36 +1,27 @@
 from main import *
+from surrogate.utils import *
 
-def runModel(model, steps = NUM_SIM_STEPS, dirname = 'real', params = None):
+def runModel(model, steps = NUM_SIM_STEPS):
 	global opts; opts.model = model
 	# Initialize Environment
 	datacenter, workload, scheduler, env, stats = initalizeEnvironment(opts.env, int(opts.type), opts.model)
-	if dirname == 'sim':
-		env.updateParams(params)
 
 	# Execute steps
 	for step in range(steps):
 		print(color.GREEN+"Execution Interval:", step, color.ENDC)
 		stepSimulation(workload, scheduler, env, stats)
-		if 'surrogate' in dirname and step % 10 == 0:
-			params = env.generateParams()
-			params = perturb_params(params)
-			env.updateParams(params)
 
 	# Cleanup and save results
 	if env.__class__.__name__ == 'Serverless': datacenter.cleanup()
 	return stats
 
-def generateRandomTrace(env, dirname, steps = NUM_SIM_STEPS, params = None):
+def generateTrace(model, steps = NUM_SIM_STEPS):
 	# return saved stats if this is a prerun host set
-	global opts
-	opts.env = env
-	os.makedirs(f"data/{dirname}", exist_ok=True)
-	stats = runModel('Random', steps, dirname, params)
-	stats.generateSimpleHostDatasetWithInterval(f'data/{dirname}/', 'cpu')
-	stats.generateSimpleMetricsDatasetWithInterval(f'data/{dirname}/', 'avgresponsetime')
-	stats.generateSimpleMetricsDatasetWithInterval(f'data/{dirname}/', 'energytotalinterval')
-	if 'surrogate' in dirname:
-		stats.generateSimulatorParamsWithInterval(f'data/{dirname}/')
+	os.makedirs(f"data/{model}", exist_ok=True)
+	stats = runModel(model, steps)
+	stats.generateSimpleHostDatasetWithInterval(f'data/{model}/', 'cpu')
+	stats.generateSimpleMetricsDatasetWithInterval(f'data/{model}/', 'avgresponsetime')
+	stats.generateSchedulerTimeDatasetWithInterval(f'data/{model}/')
 	return stats
 
 if __name__ == '__main__':
@@ -41,21 +32,16 @@ if __name__ == '__main__':
 	os.mkdir(dirname)
 	opts.type, opts.env = 2, 'Azure'
 
-	# Generate trace from Random scheduler
-	realTrace = generateRandomTrace('Azure', 'real')
+	# Generate trace from schedulers
+	schedulers = ['GOSH', 'GOBI', 'GA', 'GRAF', 'DecisionNN', 'ACOLSTM']
+	for sched in schedulers:
+		if os.path.exists('data/'+sched): continue
+		generateTrace(sched, 10)
 
-	# Train a surrogate model with generated trace
-	simSurTrace = generateRandomTrace('Sim', 'sim_surrogate', NUM_SIM_STEPS * 2)
-	surrogate = trainModel(HOSTS, FEATS)
-	
-	# Update simulator parameters
-	tunedParams = opt(surrogate, HOSTS)
+	# Train MetaNet
+	model = trainModel(HOSTS, schedulers)
+	exit()
 
-	# Generate more data trace using simulator
-	simTrace = generateRandomTrace('Sim', 'sim', NUM_SIM_STEPS * 5, tunedParams)
-
-	# Train scheduler using more vertical data
-	tunedModel = train_scheduler(HOSTS)
 
 	# Run trained scheduler using tuned scheduler
 	opts.env, opts.model = 'Azure', 'GOBI'
