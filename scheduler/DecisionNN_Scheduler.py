@@ -39,6 +39,6 @@ class DecisionNNScheduler(Scheduler):
 		start = time()
 		self.host_util = torch.FloatTensor([h.getCPU() for h in self.env.hostlist]) / 100
 		predips = self.model(self.host_util)
-		opt = self.search(predips, self.env)
+		opt = self.search(predips, self.env, tasks)
 		decisions = opt.search()
 		return decisions, time() - start

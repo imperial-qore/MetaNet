@@ -37,7 +37,7 @@ if __name__ == '__main__':
 	schedulers = ['GOSH', 'GOBI', 'GA', 'GRAF', 'DecisionNN', 'ACOLSTM']
 	for sched in schedulers:
 		if os.path.exists('data/'+sched): continue
-		generateTrace(sched, 5)
+		generateTrace(sched, NUM_SIM_STEPS)
 
 	# Train MetaNet
 	model, range_rt, range_st = trainModel(HOSTS, schedulers)
