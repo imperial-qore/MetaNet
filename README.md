@@ -1,8 +1,8 @@
-# SimTune
+# MetaNet
 
-"SimTune: Simulator Tuning to Bridge the Reality Gap for Resource Management in Edge Computing"
+"MetaNet: Learning to Dynamically Select the Optimal Scheduler in Cloud Computing Environments"
 
-<a href="https://gitpod.io/#https://github.com/imperial-qore/SimTune/">
+<a href="https://gitpod.io/#https://github.com/imperial-qore/MetaNet/">
     <img src="https://gitpod.io/button/open-in-gitpod.svg" alt="Open in gitpod">
   </a>
 
