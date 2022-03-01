@@ -21,23 +21,7 @@ class Simulator():
 		self.stats = None
 		self.all_params = None
 		self.addHostlistInit(hostinit)
-
-	def generateParams(self):
-		all_params = []
-		for host in self.hostlist:
-			params = [host.latency, host.migrationoverhead, host.ipsCap, \
-				host.ramCap.read, host.ramCap.write, \
-				host.diskCap.read, host.diskCap.write, \
-				host.bwCap.uplink, host.bwCap.downlink]
-			all_params.append(params)
-		return all_params
-	
-	def updateParams(self, params):
-		self.all_params = params
-		for i, host in enumerate(self.hostlist):
-			host.latency, host.migrationoverhead = params[i][:2]
-			# host.latency, host.migrationoverhead, host.ipsCap, host.ramCap.read, host.ramCap.write, host.diskCap.read, host.diskCap.write, host.bwCap.uplink, host.bwCap.downlink = params[i]
-
+		
 	def addHostlistInit(self, hostList):
 		assert len(hostList) == self.hostlimit
 		for IPS, RAM, Disk, Bw, Latency, Powermodel in hostList:

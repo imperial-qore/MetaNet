@@ -1,12 +1,4 @@
 from main import *
-from surrogate.surrogate import *
-import random
-
-def perturb_params(params):
-	for i in range(len(params)):
-		for j in range(len(params[i])):
-			params[i][j] = max(0, params[i][j] * (1 + (random.random() - 0.5) / 10))
-	return params	
 
 def runModel(model, steps = NUM_SIM_STEPS, dirname = 'real', params = None):
 	global opts; opts.model = model
@@ -43,7 +35,7 @@ def generateRandomTrace(env, dirname, steps = NUM_SIM_STEPS, params = None):
 
 if __name__ == '__main__':
 	global opts
-	dirname = "logs/SimTune"
+	dirname = "logs/MetaNet"
 	if not os.path.exists("logs"): os.mkdir("logs")
 	if os.path.exists(dirname): shutil.rmtree(dirname, ignore_errors=True)
 	os.mkdir(dirname)
