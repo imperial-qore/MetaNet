@@ -54,10 +54,8 @@ os.makedirs(SAVE_PATH, exist_ok=True)
 
 plt.rcParams["figure.figsize"] = 3.3,2.5
 
-# Models = [i for i in os.listdir('./logs/') if '_' not in i]
-Models = ['ACOARIMA', 'ACOLSTM', 'DecisionNN', 'SemiDirect',\
-		'GRAF', 'UAHS', 'CAHS', 'Narya', 'HASCO', 'RecSim', 'CES', 'SciNet']
-sla_baseline = 'CES' if 'CES' in Models else Models[0]
+Models = [i for i in os.listdir('./logs/') if '_' not in i]
+sla_baseline = 'GOBI' if 'CES' in Models else Models[0]
 ModelsXticks = Models
 rot = 90
 Colors = ['red', 'blue', 'green', 'orange', 'orchid', 'pink', 'cyan'] * 2
@@ -98,7 +96,6 @@ r = all_stats[sla_baseline].alltaskinfo
 for app in apps:
 	taskdict = {}; response_times = []
 	for task in r:
-		if task['application'] != app: continue
 		if task['creationID'] not in taskdict: taskdict[task['creationID']] = {}
 		taskdict[task['creationID']]['destroyAt'] = max(taskdict[task['creationID']].get('destroyAt', 0), task['destroyAt'])
 		taskdict[task['creationID']]['createAt'] = min(taskdict[task['creationID']].get('createAt', 1e3), task['createAt'])
@@ -139,13 +136,6 @@ for ylabel in yLabelsStatic:
 		if ylabel == 'Cost per container (US Dollars)':
 			d = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([0])
 			Data[ylabel][model], CI[ylabel][model] = cost / float(np.sum(d)) if len(d) != 1 else 0, np.random.normal(scale=0.1)
-		if ylabel == 'Number of completed workflows per application':
-			d = [0] * len(apps)
-			for task in stats.alltaskinfo:
-				app = task['application']
-				appid = apps.index(app)
-				d[appid] += 1
-			Data[ylabel][model], CI[ylabel][model] = d, np.random.normal(scale=2, size=len(apps))
 		if ylabel == 'Number of completed tasks per interval':
 			d = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([0])
 			Data[ylabel][model], CI[ylabel][model] = np.mean(d), mean_confidence_interval(d)
@@ -172,51 +162,6 @@ for ylabel in yLabelsStatic:
 			er = mean_confidence_interval(response_time)
 			response_time = (np.sum(response_time) / numtasks)
 			Data[ylabel][model], CI[ylabel][model] = response_time, er
-		if ylabel == 'Average Response Time (seconds) per application':
-			response_times, errors = [], []
-			for app in apps:
-				response_time = []
-				for task in stats.alltaskinfo:
-					if task['application'] == app:
-						response_time.append((task['destroyAt'] - task['createAt']) * INTERVAL_TIME)
-				response_times.append(np.mean(response_time) if response_time else 0)
-				er = mean_confidence_interval(response_time)
-				errors.append(0 if 'array' in str(type(er)) else er)
-			Data[ylabel][model], CI[ylabel][model] = response_times, errors
-		if ylabel == 'Average Execution Time (seconds) per application':
-			response_times, errors = [], []
-			for app in apps:
-				response_time = []
-				for task in stats.alltaskinfo:
-					if task['application'] == app:
-						response_time.append((task['destroyAt'] - task['startAt']) * INTERVAL_TIME)
-				response_times.append(np.mean(response_time))
-				er = mean_confidence_interval(response_time)
-				errors.append(0 if 'array' in str(type(er)) else er)
-			Data[ylabel][model], CI[ylabel][model] = response_times, errors
-		if ylabel == 'Average Waiting Time (seconds) per application':
-			response_times, errors = [], []
-			for app in apps:
-				response_time = []
-				for task in stats.alltaskinfo:
-					if task['application'] == app:
-						response_time.append((task['startAt'] - task['createAt']) * INTERVAL_TIME)
-				response_times.append(np.mean(response_time))
-				er = mean_confidence_interval(response_time)
-				errors.append(0 if 'array' in str(type(er)) else er)
-			Data[ylabel][model], CI[ylabel][model] = response_times, errors
-		if ylabel == 'Amortized Response Time (seconds) per application':
-			response_times, errors = [], []
-			for app in apps:
-				response_time = []; numtasks = 0
-				for task in stats.alltaskinfo:
-					if task['application'] == app:
-						response_time.append((task['destroyAt'] - task['createAt']) * INTERVAL_TIME)
-						numtasks += 1
-				response_times.append(np.sum(response_time) / numtasks)
-				er = mean_confidence_interval(response_time)
-				errors.append(0 if 'array' in str(type(er)) else er)
-			Data[ylabel][model], CI[ylabel][model] = response_times, errors
 		if ylabel == "Fairness (Jain's index)":
 			d = []
 			for task in stats.alltaskinfo:
@@ -225,17 +170,6 @@ for ylabel in yLabelsStatic:
 				if end > start: d.append(1 / (end - start))
 			d = jains_fairness(np.array(d))
 			Data[ylabel][model], CI[ylabel][model] = np.mean(d), np.random.normal(scale=0.05)
-		if ylabel == 'Fairness per application':
-			d = [[] for _ in range(len(apps))]
-			for task in stats.alltaskinfo:
-				start = task['startAt']
-				end = task['destroyAt']
-				app = task['application']
-				appid = apps.index(app)
-				if end > start: d[appid].append(1 / (end - start))
-			means = [jains_fairness(np.array(i)) for i in d]
-			devs  = [mean_confidence_interval(i) for i in d]
-			Data[ylabel][model], CI[ylabel][model] = means, devs
 		if ylabel == 'Amortized Workflow Response Time (seconds)':
 			d = []; taskdict = {}
 			for task in stats.alltaskinfo:
@@ -246,22 +180,6 @@ for ylabel in yLabelsStatic:
 				task = taskdict[creationID]
 				d.append((task['destroyAt'] - task['createAt']) * INTERVAL_TIME)
 			Data[ylabel][model], CI[ylabel][model] = np.mean(d), mean_confidence_interval(d)
-		if ylabel == 'Amortized Workflow Response Time per application (seconds)':
-			d = [[] for _ in range(len(apps))]
-			for app in apps:
-				taskdict = {}
-				appid = apps.index(app)	
-				for task in stats.alltaskinfo:
-					if task['application'] != app: continue
-					if task['creationID'] not in taskdict: taskdict[task['creationID']] = {}
-					taskdict[task['creationID']]['destroyAt'] = max(taskdict[task['creationID']].get('destroyAt', 0), task['destroyAt'])
-					taskdict[task['creationID']]['createAt'] = min(taskdict[task['creationID']].get('createAt', 1e3), task['createAt'])
-				for creationID in taskdict:
-					task = taskdict[creationID]
-					d[appid].append((task['destroyAt'] - task['createAt']) * INTERVAL_TIME)
-			means = [np.mean(i) for i in d]
-			devs  = [mean_confidence_interval(i) for i in d]
-			Data[ylabel][model], CI[ylabel][model] = means, devs
 		if ylabel == 'Amortized Workflow Waiting Time (seconds)':
 			d = []; taskdict = {}
 			for task in stats.alltaskinfo:
@@ -272,52 +190,6 @@ for ylabel in yLabelsStatic:
 				task = taskdict[creationID]
 				d.append((task['startAt'] - task['createAt']) * INTERVAL_TIME)
 			Data[ylabel][model], CI[ylabel][model] = np.mean(d), mean_confidence_interval(d)
-		if ylabel == 'Amortized Workflow Waiting Time per application (seconds)':
-			d = [[] for _ in range(len(apps))]
-			for app in apps:
-				taskdict = {}
-				appid = apps.index(app)	
-				for task in stats.alltaskinfo:
-					if task['application'] != app: continue
-					if task['creationID'] not in taskdict: taskdict[task['creationID']] = {}
-					taskdict[task['creationID']]['startAt'] = max(taskdict[task['creationID']].get('startAt', 0), task['startAt'])
-					taskdict[task['creationID']]['createAt'] = min(taskdict[task['creationID']].get('createAt', 1e3), task['createAt'])
-				for creationID in taskdict:
-					task = taskdict[creationID]
-					d[appid].append((task['startAt'] - task['createAt']) * INTERVAL_TIME)
-			means = [np.mean(i) for i in d]
-			devs  = [mean_confidence_interval(i) for i in d]
-			Data[ylabel][model], CI[ylabel][model] = means, devs
-		if ylabel == 'Average Workflow Accuracy':
-			d = []; taskdict = {}
-			for task in stats.alltaskinfo:
-				taskdict[task['creationID']] = accs[task['application']] * choice_multiplier[task['choice']]
-			for creationID in taskdict:
-				d.append(taskdict[creationID])
-			Data[ylabel][model], CI[ylabel][model] = np.mean(d), mean_confidence_interval(d)
-		if ylabel == 'Average Workflow Accuracy per application':
-			d = [[] for _ in range(len(apps))]
-			for app in apps:
-				taskdict = {}
-				appid = apps.index(app)	
-				for task in stats.alltaskinfo:
-					if task['application'] != app: continue
-					taskdict[task['creationID']] = accs[task['application']] * choice_multiplier[task['choice']]
-				for creationID in taskdict:
-					task = taskdict[creationID]
-					d[appid].append(taskdict[creationID])
-			means = [np.mean(i) for i in d]
-			devs  = [mean_confidence_interval(i) for i in d]
-			Data[ylabel][model], CI[ylabel][model] = means, devs
-		if ylabel == 'Decision Fraction per choice':
-			d = [0 for _ in range(len(choices))]
-			for choice in choices:
-				taskdict = {}
-				for task in stats.alltaskinfo:
-					choiceid = choices.index(task['choice'])	
-					d[choiceid] += 1
-			means = np.array(d) / np.sum(d)
-			Data[ylabel][model], CI[ylabel][model] = means, [0] * len(choices)
 		if ylabel == 'Fraction of total SLA Violations':
 			violations, total = 0, 0
 			taskdict = {}
@@ -331,22 +203,6 @@ for ylabel in yLabelsStatic:
 				total += 1
 			violations = violations/(total+1e-5)
 			Data[ylabel][model], CI[ylabel][model] = violations, np.random.normal(scale=0.05)
-		if ylabel == 'Fraction of SLA Violations per application':
-			violations, total = [0]*len(apps), [0]*len(apps)
-			for app in apps:
-				taskdict = {}
-				appid = apps.index(app)	
-				for task in stats.alltaskinfo:
-					if task['application'] != app: continue
-					if task['creationID'] not in taskdict: taskdict[task['creationID']] = {}
-					taskdict[task['creationID']]['destroyAt'] = max(taskdict[task['creationID']].get('destroyAt', 0), task['destroyAt'])
-					taskdict[task['creationID']]['createAt'] = min(taskdict[task['creationID']].get('createAt', 1e3), task['createAt'])
-				for creationID in taskdict:
-					task = taskdict[creationID]
-					violations[appid] += 1 if task['destroyAt'] - task['createAt'] > sla[app] else 0
-					total[appid] += 1
-			violations = [violations[i]/(total[i]+1e-5) for i in range(len(apps))]
-			Data[ylabel][model], CI[ylabel][model] = violations, np.random.normal(scale=0.05, size=len(apps))
 		# Host metrics
 		if ylabel == 'Average CPU Utilization (%)':
 			d = np.array([(np.average(i['cpu']) if i != [] else 0) for i in stats.hostinfo]) if stats else np.array([0.])
@@ -365,22 +221,6 @@ for ylabel in yLabelsStatic:
 # Bar Graphs
 x = range(5,100*5,5)
 pprint(Data)
-
-rt_pa = {}; acc_pa = {}; dec = {}
-for model in Models:
-	rt_pa[model] = {}; acc_pa[model] = {}; dec[model] = {}
-	for i, app in enumerate(apps):
-		rt_pa[model][app] = Data['Amortized Response Time (seconds) per application'][model][i]
-		acc_pa[model][app] = Data['Average Workflow Accuracy per application'][model][i]
-	for i, choice in enumerate(choices):
-		dec[model][choice] = Data['Decision Fraction per choice'][model][i]
-with open("rt_pa.json", "w") as outfile:
-    json.dump(rt_pa, outfile, indent=4)
-with open("acc_pa.json", "w") as outfile:
-    json.dump(acc_pa, outfile, indent=4)
-with open("dec.json", "w") as outfile:
-    json.dump(dec, outfile, indent=4)
-# exit()
 
 table = {"Models": Models}
 
