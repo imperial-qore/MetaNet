@@ -34,6 +34,24 @@ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 python3 metanet.py
 ```
 
+## Arxiv Link
+
+A preliminary version of this work was accepted as a poster in ACM SIGMETRICS 2022: https://arxiv.org/pdf/2205.10640.pdf.
+
+The conference version is available here: https://arxiv.org/pdf/2205.10642.pdf.
+
+## Cite this work
+Our work is published in IEEE CLOUD Conference. Cite using the following bibtex entry.
+```bibtex
+@article{tuli2022splitplace,
+  author={Tuli, Shreshth and Casale, Giuliano and Jennings, Nicholas R.},
+  journal={IEEE CLOUD}, 
+  title={{MetaNet: Automated Dynamic Selection of Scheduling Policies in Cloud Environments}}, 
+  year={2022}
+}
+```
+
+
 ## License
 
 BSD-3-Clause. 
