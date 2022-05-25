@@ -43,7 +43,7 @@ The conference version is available here: https://arxiv.org/pdf/2205.10642.pdf.
 ## Cite this work
 Our work is published in IEEE CLOUD Conference. Cite using the following bibtex entry.
 ```bibtex
-@article{tuli2022splitplace,
+@article{tuli2022metanet,
   author={Tuli, Shreshth and Casale, Giuliano and Jennings, Nicholas R.},
   journal={IEEE CLOUD}, 
   title={{MetaNet: Automated Dynamic Selection of Scheduling Policies in Cloud Environments}}, 
